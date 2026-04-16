@@ -21,6 +21,16 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/tags/curation/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/decision-making/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/tags/history/</loc>
     <lastmod>2026-04-16</lastmod>
     <priority>0.5</priority>
@@ -61,7 +71,17 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/tags/nlp/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/tags/notebooklm/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/policy/</loc>
     <lastmod>2026-04-16</lastmod>
     <priority>0.5</priority>
   </url>
@@ -72,6 +92,16 @@
   </url>
   <url>
     <loc>https://trail.webhouse.app/tags/rag/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/strategy/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/systems-design/</loc>
     <lastmod>2026-04-16</lastmod>
     <priority>0.5</priority>
   </url>
@@ -96,12 +126,27 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/trails/how-trail-works/compile-time-knowledge-vs-rag/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/trails/how-trail-works/how-a-brain-actually-remembers/</loc>
     <lastmod>2026-04-16</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://trail.webhouse.app/trails/how-trail-works/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/trails/how-trail-works/knowledge-that-compounds/</loc>
+    <lastmod>2026-04-16</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/trails/how-trail-works/three-filters-on-the-gate/</loc>
     <lastmod>2026-04-16</lastmod>
     <priority>0.5</priority>
   </url>
