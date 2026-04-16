@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>#notebooklm — trail</title>
-  <meta name="description" content="Content tagged notebooklm.">
-  <meta property="og:title" content="#notebooklm">
-  <meta property="og:description" content="Content tagged notebooklm.">
+  <title>Why Your Knowledge Base Should Compile, Not Search — trail</title>
+  <meta name="description" content="Most AI knowledge systems are sophisticated search engines that forget between queries. The organizations winning are building something different — and the architectural choice has direct consequences for cost, accuracy, and defensibility.">
+  <meta property="og:title" content="Why Your Knowledge Base Should Compile, Not Search">
+  <meta property="og:description" content="Most AI knowledge systems are sophisticated search engines that forget between queries. The organizations winning are building something different — and the architectural choice has direct consequences for cost, accuracy, and defensibility.">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="/uploads/favicon.svg">
   <link rel="apple-touch-icon" href="/uploads/memx-logo.svg">
@@ -30,7 +30,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-html, body { overflow-x: hidden; max-width: 100vw; }
 body {
   font-family: var(--font-sans);
   background: var(--bg);
@@ -41,113 +40,48 @@ body {
 ::selection { background: rgba(232, 168, 124, 0.3); color: var(--fg); }
 
 a { color: inherit; text-decoration: none; }
-img { max-width: 100%; display: block; height: auto; }
+img { max-width: 100%; display: block; }
 button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-svg { max-width: 100%; height: auto; }
 
 /* Navbar */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.5rem;
   display: flex; justify-content: space-between; align-items: center;
   background: var(--bg-80);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--fg-10);
 }
-@media (min-width: 768px) { .nav { padding: 1rem 1.5rem; } }
-.nav-brand { display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
-.nav-brand img { width: 32px; height: 32px; flex-shrink: 0; }
-@media (min-width: 768px) { .nav-brand { gap: 0.875rem; } .nav-brand img { width: 40px; height: 40px; } }
+.nav-brand { display: flex; align-items: center; gap: 0.875rem; }
+.nav-brand img { width: 40px; height: 40px; }
 .nav-brand .brand-text {
   font-family: var(--font-mono);
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--fg);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-@media (min-width: 768px) { .nav-brand .brand-text { font-size: 1.375rem; } }
 .nav-links { display: none; gap: 2rem; font-size: 0.875rem; font-weight: 500; color: var(--fg-70); }
 .nav-links a { transition: color 0.15s; }
 .nav-links a:hover { color: var(--fg); }
 @media (min-width: 768px) { .nav-links { display: flex; } }
 
-.nav-actions { display: flex; gap: 0.5rem; align-items: center; }
-@media (min-width: 768px) { .nav-actions { gap: 1rem; } }
+.nav-actions { display: flex; gap: 1rem; align-items: center; }
 .nav-signin {
   font-size: 0.875rem; font-weight: 500; color: var(--fg);
   transition: color 0.15s;
-  display: none;
 }
-@media (min-width: 768px) { .nav-signin { display: inline; } }
 .nav-signin:hover { color: var(--accent); }
 .nav-cta {
-  padding: 0.45rem 0.85rem;
+  padding: 0.5rem 1rem;
   background: var(--fg); color: var(--bg);
-  font-size: 0.8rem; font-weight: 500;
+  font-size: 0.875rem; font-weight: 500;
   border-radius: 6px;
   border: 1px solid transparent;
   transition: all 0.2s;
-  white-space: nowrap;
 }
-@media (min-width: 768px) { .nav-cta { padding: 0.5rem 1rem; font-size: 0.875rem; } }
 .nav-cta:hover { background: rgba(26, 23, 21, 0.9); border-color: var(--accent); }
-
-/* Mobile hamburger toggle */
-.nav-toggle {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 40px; height: 40px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid var(--fg-10);
-  border-radius: 6px;
-  cursor: pointer;
-  gap: 4px;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
-}
-.nav-toggle:hover { background: var(--bg-50); }
-.nav-toggle:active { transform: scale(0.96); }
-.nav-toggle span {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: var(--fg);
-  border-radius: 2px;
-  transition: transform 0.2s, opacity 0.2s;
-}
-@media (min-width: 768px) { .nav-toggle { display: none; } }
-body[data-menu-open="true"] .nav-toggle span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-body[data-menu-open="true"] .nav-toggle span:nth-child(2) { opacity: 0; }
-body[data-menu-open="true"] .nav-toggle span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-
-/* Mobile menu overlay */
-.nav-mobile {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--bg);
-  z-index: 49;
-  padding: 5rem 1.5rem 2rem;
-  display: flex; flex-direction: column; gap: 1.5rem;
-  transform: translateX(100%);
-  transition: transform 0.25s ease-out;
-  overflow-y: auto;
-}
-body[data-menu-open="true"] .nav-mobile { transform: translateX(0); }
-@media (min-width: 768px) { .nav-mobile { display: none; } }
-.nav-mobile a {
-  font-size: 1.125rem; font-weight: 500; color: var(--fg);
-  padding: 0.625rem 0;
-  border-bottom: 1px solid var(--fg-10);
-}
-.nav-mobile a:last-child { border-bottom: none; }
-body[data-menu-open="true"] { overflow: hidden; }
 
 /* Hero */
 .hero {
@@ -163,11 +97,9 @@ body[data-menu-open="true"] { overflow: hidden; }
 .hero-inner {
   position: relative; z-index: 10;
   max-width: 56rem; margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   text-align: center;
-  width: 100%;
 }
-@media (min-width: 640px) { .hero-inner { padding: 0 1.5rem; } }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.25rem 0.75rem; margin-bottom: 2rem;
@@ -247,10 +179,9 @@ body[data-menu-open="true"] { overflow: hidden; }
 
 /* Features */
 .features {
-  padding: 4rem 1rem;
+  padding: 6rem 1.5rem;
   border-top: 1px solid var(--fg-10);
 }
-@media (min-width: 768px) { .features { padding: 6rem 1.5rem; } }
 .features-inner { max-width: 72rem; margin: 0 auto; }
 .features-header { margin-bottom: 4rem; }
 .features-header h2 {
@@ -298,10 +229,8 @@ body[data-menu-open="true"] { overflow: hidden; }
 }
 
 /* Article (long-form pages) */
-.container { max-width: 44rem; margin: 0 auto; padding: 0 1rem; }
-@media (min-width: 640px) { .container { padding: 0 1.5rem; } }
-.article { padding: 5rem 0 3rem; }
-@media (min-width: 768px) { .article { padding: 7rem 0 4rem; } }
+.container { max-width: 44rem; margin: 0 auto; padding: 0 1.5rem; }
+.article { padding: 7rem 0 4rem; }
 .article-header { margin-bottom: 3rem; border-bottom: 1px solid var(--fg-10); padding-bottom: 2rem; }
 .article-eyebrow {
   font-family: var(--font-mono);
@@ -340,7 +269,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 .article-cover { margin: 2rem 0 0; }
 .article-cover img { width: 100%; border-radius: 4px; }
 
-.prose { font-size: 1.0625rem; line-height: 1.75; color: var(--fg); word-wrap: break-word; overflow-wrap: break-word; }
+.prose { font-size: 1.0625rem; line-height: 1.75; color: var(--fg); }
 .prose h1, .prose h2, .prose h3 { letter-spacing: -0.02em; }
 .prose h2 { font-size: 1.625rem; font-weight: 700; margin: 3rem 0 1rem; }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.75rem; }
@@ -393,10 +322,9 @@ body[data-menu-open="true"] { overflow: hidden; }
 /* Footer */
 .footer {
   border-top: 1px solid var(--fg-10);
-  padding: 2rem 1rem;
+  padding: 3rem 1.5rem;
   background: var(--bg);
 }
-@media (min-width: 768px) { .footer { padding: 3rem 1.5rem; } }
 .footer-inner {
   max-width: 72rem; margin: 0 auto;
   display: flex; flex-direction: column;
@@ -560,47 +488,62 @@ body[data-menu-open="true"] { overflow: hidden; }
     <div class="nav-actions">
       <a href="#" class="nav-signin">Sign In</a>
       <a href="#" class="nav-cta">Initialize Node</a>
-      <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
-        <span></span><span></span><span></span>
-      </button>
     </div>
   </nav>
-  <div id="mobile-menu" class="nav-mobile" role="navigation" aria-label="Mobile menu" aria-hidden="true">
-    <a href="#features">Architecture</a>
-    <a href="#docs">Documentation</a>
-    <a href="/trails/">Trails</a>
-    <a href="/the-1945-concept/">The 1945 Concept</a>
-    <a href="#">Sign In</a>
-  </div>
-  <script>
-    (function () {
-      var btn = document.querySelector('.nav-toggle');
-      var menu = document.getElementById('mobile-menu');
-      var body = document.body;
-      if (!btn || !menu) return;
-      function setOpen(open) {
-        body.dataset.menuOpen = open ? 'true' : 'false';
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-        menu.setAttribute('aria-hidden', open ? 'false' : 'true');
-      }
-      btn.addEventListener('click', function () { setOpen(body.dataset.menuOpen !== 'true'); });
-      menu.addEventListener('click', function (e) {
-        if (e.target instanceof HTMLAnchorElement) setOpen(false);
-      });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
-    })();
-  </script>
   <article class="article container"><header class="article-header">
-    <div class="article-eyebrow">Tag</div>
-    <h1>#notebooklm</h1>
-    <p class="article-lead">1 item tagged <code>notebooklm</code>.</p>
-  </header><div class="post-grid"><a class="post-card" href="/trails/research/trail-and-notebooklm/">
-    <div class="post-card-eyebrow">Research</div>
-    <h3>Trail and NotebookLM: Same Ethos, Different Artifact</h3>
-    <p>NotebookLM proved source-grounded ingest-time tools can ship to millions. Trail shares that ethos and diverges on one question: what the system leaves behind.</p>
-    <div class="post-card-meta">Research · April 15, 2026 · 6 min read</div>
-  </a></div></article>
+      <div class="article-eyebrow">How Trail Works</div>
+      <h1>Why Your Knowledge Base Should Compile, Not Search</h1>
+      <p class="article-lead">Most AI knowledge systems are sophisticated search engines that forget between queries. The organizations winning are building something different — and the architectural choice has direct consequences for cost, accuracy, and defensibility.</p>
+      <div class="article-meta">How Trail Works · trail by broberg.ai · April 15, 2026</div>
+      
+    </header><div class="prose"><h2>A strategic argument for compile-time knowledge infrastructure</h2>
+<p>If your organization is investing in AI for knowledge work — internal wikis, customer-facing chat, expert systems, research support — there is a foundational architectural decision being made on your behalf, often without anyone naming it explicitly. The decision is between <strong>search-time</strong> and <strong>compile-time</strong> knowledge systems. The two are not interchangeable. They have different cost profiles, different accuracy characteristics, different defensibility properties, and they suit different classes of problem.</p>
+<p>The dominant pattern in the market right now is <strong>retrieval-augmented generation</strong>, or RAG. RAG is a search engine with a language model attached. It works well for some problems and poorly for others, and the difference matters for what you can build on top of it.</p>
+<p>Trail is a different architecture: compile-time knowledge infrastructure, modeled on how human memory actually works. This document explains the difference in terms that should matter to anyone deciding where to place an organizational bet.</p>
+<h2>The two architectures, plainly</h2>
+<p>A search-time system answers each question fresh. The user asks something; the system searches a database of document fragments; the language model writes an answer based on what was retrieved; the system forgets everything and waits for the next query. Nothing accumulates. Each query is independent.</p>
+<p>A compile-time system does the work in advance. Sources are read, integrated, cross-referenced, and compiled into structured knowledge pages as they enter the system. When a user asks a question, the system reads from already-integrated knowledge rather than searching raw fragments. The structure grows and improves with every source added.</p>
+<p>The analogy to human cognition is direct. When you ask a domain expert a question, they do not search their memory for relevant fragments. They draw on knowledge they have already integrated — knowledge that was built up over years of reading, practice, and reflection. The integration happened over time, mostly while they were not actively answering questions. The answer comes quickly and coherently because the work was done in advance.</p>
+<p>A search-time AI system is closer to a research assistant who Googles every question. A compile-time system is closer to the expert.</p>
+<h2>Where this matters strategically</h2>
+<p>Four properties of compile-time architecture have direct strategic consequences.</p>
+<p><strong>Knowledge accumulates as a defensible asset.</strong> Most AI investments today produce no durable artifact. The vector database underlying a RAG system is a commodity asset — same chunks, same embeddings, same retrieval. Switch vendors and you replace it in a week. A compiled wiki, by contrast, is a structured knowledge asset specific to your organization. It contains the integrated understanding that emerged from your sources, your curators, your decisions. It compounds in value over time. It is not portable to a competitor without the same compilation effort.</p>
+<p>For organizations whose competitive advantage rests on accumulated expertise — clinical practice, legal research, scientific R&amp;D, specialized consulting — this is the difference between AI as a productivity tool and AI as an institutional memory layer.</p>
+<p><strong>Provenance is structural, not bolted on.</strong> In regulated industries, the question &quot;where did this answer come from?&quot; is not optional. Healthcare, legal, financial services, and government deployments all require traceable provenance from any AI-generated assertion back to its source material, with version history.</p>
+<p>RAG systems can generate citations, but the citations are correlations between vectors. The system does not actually know which source supports which claim — it knows which chunks were nearby in embedding space when the language model wrote the answer. Compile-time systems make provenance structural: every claim is linked to the specific source revisions that support it. When a source is updated, the affected pages are flagged automatically. When a claim is contested, the lineage is explicit and defensible.</p>
+<p>This is not a feature. It is a baseline requirement for any deployment where being wrong has consequences beyond user frustration.</p>
+<p><strong>The economics favor compile-time at scale.</strong> Search-time systems pay the language model cost on every query. Each query stuffs ten or twenty document chunks into a context window and asks the model to synthesize an answer. Compile-time systems pay the language model cost during ingest — once per source — and queries read from the already-compiled artifact, which is denser and faster to process.</p>
+<p>For a knowledge base serving high query volume, the math is straightforward. The compile-time architecture trades higher per-source ingest cost for lower per-query cost, and the crossover point typically arrives within weeks of deployment. For low-query-volume use cases (one-off lookups across a static corpus), search-time remains cheaper. Most organizational knowledge work is the former.</p>
+<p><strong>Quality improves with corpus size, rather than degrading.</strong> This is the property that surprises people most. Search-time systems get worse as the corpus grows: more documents means noisier retrieval, more candidates means harder filtering, more chunks means lower precision. Operators of large RAG deployments spend significant engineering effort fighting this degradation.</p>
+<p>Compile-time systems get better as the corpus grows because each new source can update existing pages, strengthen existing connections, and resolve previous contradictions. The tenth source improves the wiki in light of the previous nine. The hundredth benefits from the integrated structure of the previous ninety-nine. This is the same property that makes a domain expert more knowledgeable after twenty years than after two — accumulated integration, not just accumulated information.</p>
+<h2>What this means for vendor selection</h2>
+<p>If you are evaluating AI knowledge infrastructure vendors, three diagnostic questions separate compile-time architectures from search-time architectures dressed up in compile-time language.</p>
+<p><strong>Does the system produce a persistent compiled artifact, or only retrieve raw chunks?</strong> Ask to see the wiki pages, document store, or knowledge graph that grows with use. If the answer is &quot;we have a vector database with chunks of your documents,&quot; it is search-time. If the answer is &quot;we have markdown wiki pages compiled from your sources, with cross-references and provenance,&quot; it is compile-time.</p>
+<p><strong>What happens when a source is updated?</strong> A compile-time system flags the affected pages for re-review and recompilation. A search-time system silently retains the older chunks and may continue to retrieve them. Ask the vendor to walk through this scenario explicitly.</p>
+<p><strong>Where does the human curator fit?</strong> Compile-time architectures have a first-class role for human review of proposed changes — usually a queue of candidates that the curator approves, edits, or rejects. Search-time systems have no such role because there is nothing to review; the system retrieves and answers in one step. If the vendor&#39;s answer to &quot;how does my expert correct the system?&quot; is &quot;we retrain the embeddings&quot; or &quot;we add to the prompt,&quot; that is search-time architecture.</p>
+<p>These three questions cannot be faked in a sales conversation. Either the architecture supports them or it does not.</p>
+<h2>Where search-time is the right answer</h2>
+<p>To be balanced: search-time systems are the right architecture for some workloads. If your use case is question-answering over a static reference corpus, with no need for accumulation or expert correction, RAG works well. Examples include customer support chat over product documentation, code search across a repository, and Q&amp;A over recent news.</p>
+<p>The mistake is using search-time architecture for problems that require accumulation. Building a research wiki for a clinical practice. Maintaining institutional knowledge in a consulting firm. Supporting expert decision-making in any domain where the depth of integrated understanding matters more than the speed of any individual lookup. These are compile-time problems being forced into search-time architectures because RAG was the easiest pattern to deploy in 2023-2024.</p>
+<p>The market is now correcting. Compile-time architectures — under various names like &quot;AI knowledge graphs,&quot; &quot;LLM wikis,&quot; &quot;compiled knowledge systems&quot; — are emerging as the answer for the workloads where accumulation matters. Trail is one such system, designed explicitly around the architectural commitments described above.</p>
+<h2>A brief historical note</h2>
+<p>The compile-time architecture is not new in concept. It was first described in detail by Vannevar Bush, the wartime director of the U.S. Office of Scientific Research and Development, in a 1945 essay in <em>The Atlantic Monthly</em>. Bush proposed a hypothetical machine he called the <strong>memex</strong> — a desk with microfilm storage that would let a researcher build associative trails of knowledge through their personal corpus. His central argument was that human cognition operates by association and integration, not by retrieval from indexed storage, and that knowledge systems built on the latter model were structurally mismatched with how thinking actually works.</p>
+<p>Bush could not build the memex; the technology to compile knowledge automatically did not exist in 1945. But the architectural argument was correct, and it has been periodically rediscovered ever since — in Doug Engelbart&#39;s NLS in the 1960s, Ted Nelson&#39;s hypertext work, the Web itself, and most recently in the LLM Wiki pattern articulated by Andrej Karpathy in late 2025.</p>
+<p>Language models are the integration mechanism Bush could not build. They make compile-time knowledge infrastructure technically tractable for the first time. The microfilm reels in the base of Bush&#39;s memex desk — the visual mark we chose for Trail — were not a technical detail. They were the storage substrate for trails of meaning. Trail is the engine that builds and maintains those trails for the modern equivalent of Bush&#39;s vision.</p>
+<p>The SaaS successor to memxcloud is the commercial product built on trail. It is what most organizations will adopt; Trail is what runs underneath.</p>
+<h2>The decision</h2>
+<p>The architectural choice between search-time and compile-time is being made — explicitly or implicitly — every time an organization deploys AI knowledge infrastructure. Most teams default to RAG because it is the easiest pattern to ship and the most familiar. For some workloads, this is the right call. For workloads where knowledge should accumulate, where provenance matters, where experts need to curate, and where the goal is institutional memory rather than improved search, it is the wrong call.</p>
+<p>The organizations winning long-term with AI knowledge infrastructure are building compile-time systems. They are treating their knowledge base as a durable, compounding asset. They are paying the higher upfront cost of integration to get the lower ongoing cost and higher quality of compiled understanding.</p>
+<p>This is the bet Trail represents. We think the architecture matters more than the model — and that the architecture Bush described in 1945 is the right one for the problems organizations are actually trying to solve in 2026.</p>
+<hr>
+<h3>Further reading</h3>
+<ul>
+<li>Vannevar Bush, <a href="https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/"><em>As We May Think</em></a> — <em>The Atlantic</em>, July 1945</li>
+<li>Andrej Karpathy, <em>LLM Wiki</em> — described publicly in October 2025</li>
+<li>For implementation details, architectural specifications, and the case for compile-time architecture from an engineering perspective, see <a href="/trails/how-trail-works/compile-time-knowledge-vs-rag/">Compile-Time Knowledge: A Technical Argument Against RAG</a></li>
+<li>For the historical lineage from Bush&#39;s 1945 vision to Trail, see <a href="/the-1945-concept/">As We May Think: The 1945 Vision That Became Trail</a></li>
+</ul>
+</div><div class="post-footer"><div class="post-tags"><a class="post-tag" href="/tags/strategy/">#strategy</a><a class="post-tag" href="/tags/knowledge-infrastructure/">#knowledge-infrastructure</a><a class="post-tag" href="/tags/rag/">#rag</a><a class="post-tag" href="/tags/decision-making/">#decision-making</a></div><a class="post-more" href="/trails/how-trail-works/">← MORE FROM HOW TRAIL WORKS</a></div></article>
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
