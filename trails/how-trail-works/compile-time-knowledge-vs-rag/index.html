@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compile-Time Knowledge: A Technical Argument Against RAG — trail</title>
+  <meta name="description" content="RAG is a search engine wearing a language model as a hat. Trail compiles knowledge the way a brain consolidates memory — and the architectural difference shows up in latency, accuracy, provenance, and cost.">
+  <meta property="og:title" content="Compile-Time Knowledge: A Technical Argument Against RAG">
+  <meta property="og:description" content="RAG is a search engine wearing a language model as a hat. Trail compiles knowledge the way a brain consolidates memory — and the architectural difference shows up in latency, accuracy, provenance, and cost.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="/uploads/favicon.svg">
+  <link rel="apple-touch-icon" href="/uploads/memx-logo.svg">
+  <meta name="theme-color" content="#FAF9F5">
+  <style>
+:root {
+  --bg: #FAF9F5;
+  --fg: #1a1715;
+  --accent: #e8a87c;
+  --fg-10: rgba(26, 23, 21, 0.10);
+  --fg-20: rgba(26, 23, 21, 0.20);
+  --fg-40: rgba(26, 23, 21, 0.40);
+  --fg-60: rgba(26, 23, 21, 0.60);
+  --fg-70: rgba(26, 23, 21, 0.70);
+  --bg-50: rgba(250, 249, 245, 0.50);
+  --bg-80: rgba(250, 249, 245, 0.80);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", "Courier New", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+::selection { background: rgba(232, 168, 124, 0.3); color: var(--fg); }
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* Navbar */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  padding: 1rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg-80);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--fg-10);
+}
+.nav-brand { display: flex; align-items: center; gap: 0.875rem; }
+.nav-brand img { width: 40px; height: 40px; }
+.nav-brand .brand-text {
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.nav-links { display: none; gap: 2rem; font-size: 0.875rem; font-weight: 500; color: var(--fg-70); }
+.nav-links a { transition: color 0.15s; }
+.nav-links a:hover { color: var(--fg); }
+@media (min-width: 768px) { .nav-links { display: flex; } }
+
+.nav-actions { display: flex; gap: 1rem; align-items: center; }
+.nav-signin {
+  font-size: 0.875rem; font-weight: 500; color: var(--fg);
+  transition: color 0.15s;
+}
+.nav-signin:hover { color: var(--accent); }
+.nav-cta {
+  padding: 0.5rem 1rem;
+  background: var(--fg); color: var(--bg);
+  font-size: 0.875rem; font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.nav-cta:hover { background: rgba(26, 23, 21, 0.9); border-color: var(--accent); }
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding-top: 5rem; overflow: hidden;
+}
+#trail-graph {
+  position: absolute; inset: 0;
+  pointer-events: none; opacity: 0.4; z-index: 0;
+}
+.hero-inner {
+  position: relative; z-index: 10;
+  max-width: 56rem; margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.25rem 0.75rem; margin-bottom: 2rem;
+  border: 1px solid var(--fg-20); border-radius: 9999px;
+  font-size: 0.75rem; font-family: var(--font-mono);
+  background: var(--bg-50); backdrop-filter: blur(4px);
+}
+.eyebrow .dot {
+  width: 0.5rem; height: 0.5rem; border-radius: 9999px;
+  background: var(--accent);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.hero h1 {
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.hero h1 .accent {
+  background: linear-gradient(to right, var(--fg), rgba(232, 168, 124, 0.8));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero p.lead {
+  font-size: 1.125rem;
+  color: var(--fg-70);
+  margin: 0 auto 2.5rem; max-width: 40rem;
+  line-height: 1.6;
+}
+@media (min-width: 768px) { .hero p.lead { font-size: 1.25rem; } }
+
+.cta-group {
+  display: flex; flex-direction: column; gap: 1rem;
+  justify-content: center; align-items: center;
+}
+@media (min-width: 640px) { .cta-group { flex-direction: row; } }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: var(--fg); color: var(--bg);
+}
+.btn-primary:hover {
+  background: rgba(26, 23, 21, 0.9);
+  box-shadow: 0 10px 25px -5px rgba(232, 168, 124, 0.2);
+}
+.btn-secondary {
+  background: transparent; border: 1px solid var(--fg-20);
+  color: var(--fg);
+  font-family: var(--font-mono); font-size: 0.875rem;
+}
+.btn-secondary:hover { border-color: var(--fg); }
+
+.scroll-indicator {
+  position: absolute; bottom: 2.5rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  opacity: 0.5; animation: bounce 2s infinite;
+}
+.scroll-indicator .line {
+  width: 1px; height: 3rem;
+  background: linear-gradient(to bottom, transparent, var(--fg));
+}
+@keyframes bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -8px); }
+}
+
+/* Features */
+.features {
+  padding: 6rem 1.5rem;
+  border-top: 1px solid var(--fg-10);
+}
+.features-inner { max-width: 72rem; margin: 0 auto; }
+.features-header { margin-bottom: 4rem; }
+.features-header h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2rem);
+  font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem;
+}
+.features-header p {
+  color: var(--fg-60); max-width: 36rem;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.25rem;
+}
+@media (min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.feature-card {
+  position: relative; overflow: hidden;
+  padding: 1.5rem;
+  border: 1px solid var(--fg-10);
+  background: var(--bg);
+  transition: background 0.2s;
+}
+.feature-card:hover { background: #fff; }
+.feature-card::before {
+  content: "";
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-card .icon { margin-bottom: 1rem; color: var(--fg); }
+.feature-card h3 {
+  font-family: var(--font-mono);
+  font-size: 1.125rem; font-weight: 600;
+  letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  color: var(--fg);
+}
+.feature-card p {
+  color: var(--fg-70);
+  font-size: 0.875rem; line-height: 1.6;
+}
+
+/* Article (long-form pages) */
+.container { max-width: 44rem; margin: 0 auto; padding: 0 1.5rem; }
+.article { padding: 7rem 0 4rem; }
+.article-header { margin-bottom: 3rem; border-bottom: 1px solid var(--fg-10); padding-bottom: 2rem; }
+.article-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.article-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.article-lead {
+  font-size: 1.125rem;
+  color: var(--fg-70);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+.article-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--fg-60);
+}
+.article-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 1rem; }
+.article-tags .tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--fg-10);
+  border-radius: 9999px;
+  color: var(--fg-60);
+}
+.article-cover { margin: 2rem 0 0; }
+.article-cover img { width: 100%; border-radius: 4px; }
+
+.prose { font-size: 1.0625rem; line-height: 1.75; color: var(--fg); }
+.prose h1, .prose h2, .prose h3 { letter-spacing: -0.02em; }
+.prose h2 { font-size: 1.625rem; font-weight: 700; margin: 3rem 0 1rem; }
+.prose h3 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.75rem; }
+.prose p { margin-bottom: 1.25rem; }
+.prose strong { font-weight: 600; }
+.prose em { font-style: italic; }
+.prose a { color: var(--fg); border-bottom: 1px solid var(--accent); transition: color 0.15s; }
+.prose a:hover { color: var(--accent); }
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  margin: 1.75rem 0;
+  color: var(--fg-70);
+  font-style: italic;
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+.prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.prose li { margin-bottom: 0.5rem; }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: rgba(26, 23, 21, 0.06);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+.prose pre {
+  background: var(--fg); color: var(--bg);
+  padding: 1rem 1.25rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.prose pre code { background: none; padding: 0; color: inherit; }
+.prose hr { border: none; border-top: 1px solid var(--fg-10); margin: 3rem 0; }
+.prose figure {
+  margin: 1rem 0 1.5rem;
+  text-align: center;
+}
+.prose figure svg { max-width: 100%; height: auto; }
+.prose figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--fg-60);
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
+.prose img { max-width: 100%; border-radius: 4px; margin: 1.5rem auto; }
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--fg-10);
+  padding: 3rem 1.5rem;
+  background: var(--bg);
+}
+.footer-inner {
+  max-width: 72rem; margin: 0 auto;
+  display: flex; flex-direction: column;
+  gap: 1.5rem; align-items: center;
+  justify-content: space-between;
+}
+@media (min-width: 768px) { .footer-inner { flex-direction: row; } }
+.footer-brand { display: flex; align-items: center; gap: 0.625rem; }
+.footer-brand img { width: 32px; height: 32px; }
+.footer-brand span {
+  font-family: var(--font-mono);
+  font-size: 1rem; font-weight: 600;
+}
+.footer-links { display: flex; gap: 1.5rem; font-family: var(--font-mono); font-size: 0.875rem; color: var(--fg-60); }
+.footer-links a { transition: color 0.15s; }
+.footer-links a:hover { color: var(--accent); }
+.footer-copy { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-40); }
+.footer-copy a { color: var(--fg-60); border-bottom: 1px dotted var(--fg-20); transition: color 0.15s, border-color 0.15s; }
+.footer-copy a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Clickable article tags (reused by pages) */
+.article-tags .tag { transition: color 0.15s, border-color 0.15s; }
+.article-tags .tag:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Trails index + category pages */
+.trails-section { margin: 3rem 0; }
+.trails-section-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 1rem; margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--fg-10); padding-bottom: 0.5rem;
+}
+.trails-section-header h2 {
+  font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em;
+}
+.trails-section-link {
+  font-family: var(--font-mono); font-size: 0.75rem;
+  color: var(--fg-60); letter-spacing: 0.06em;
+  transition: color 0.15s;
+}
+.trails-section-link:hover { color: var(--accent); }
+.post-empty { color: var(--fg-60); font-style: italic; margin: 2rem 0; }
+
+.post-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 0.25rem;
+}
+@media (min-width: 640px) { .post-grid { grid-template-columns: repeat(2, 1fr); } }
+.post-card {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--fg-10);
+  background: var(--bg);
+  transition: background 0.2s, border-color 0.2s;
+  position: relative; overflow: hidden;
+}
+.post-card::before {
+  content: "";
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 2px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s;
+}
+.post-card:hover { background: #fff; border-color: var(--fg-20); }
+.post-card:hover::before { transform: scaleX(1); }
+.post-card-eyebrow {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent);
+}
+.post-card h3 {
+  font-size: 1.125rem; font-weight: 600;
+  letter-spacing: -0.02em; line-height: 1.3;
+}
+.post-card p {
+  color: var(--fg-70); font-size: 0.9rem; line-height: 1.55;
+  margin: 0;
+}
+.post-card-meta {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  color: var(--fg-60); margin-top: auto; padding-top: 0.25rem;
+}
+
+/* Post footer (below prose): bottom tag pills + "more from category" */
+.post-footer {
+  margin: 3rem 0 0;
+  padding-top: 2rem;
+  border-top: 1px solid var(--fg-10);
+}
+.post-tags {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.post-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--fg-20);
+  border-radius: 9999px;
+  color: var(--fg-70);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.post-tag:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(232, 168, 124, 0.06);
+}
+.post-more {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--fg-60);
+  transition: color 0.15s;
+}
+.post-more:hover { color: var(--accent); }
+
+.post-related {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--fg-10);
+}
+.post-related-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-60);
+  margin-bottom: 0.75rem;
+}
+.post-related ul { list-style: none; padding: 0; margin: 0; }
+.post-related li { margin: 0.4rem 0; }
+.post-related a {
+  font-size: 1rem;
+  color: var(--fg);
+  border-bottom: 1px solid var(--fg-10);
+  padding-bottom: 0.15rem;
+  transition: color 0.15s, border-color 0.15s;
+}
+.post-related a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.post-related-arrow {
+  color: var(--fg-60);
+  margin-left: 0.25rem;
+  transition: color 0.15s, transform 0.15s;
+  display: inline-block;
+}
+.post-related a:hover .post-related-arrow { color: var(--accent); transform: translateX(3px); }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">
+      <img src="/uploads/memx-logo.svg" alt="trail" width="40" height="40">
+      <span class="brand-text">trail</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Architecture</a>
+      <a href="#docs">Documentation</a>
+      <a href="/trails/">Trails</a>
+      <a href="/the-1945-concept/">The 1945 Concept</a>
+    </div>
+    <div class="nav-actions">
+      <a href="#" class="nav-signin">Sign In</a>
+      <a href="#" class="nav-cta">Initialize Node</a>
+    </div>
+  </nav>
+  <article class="article container"><header class="article-header">
+      <div class="article-eyebrow">How Trail Works</div>
+      <h1>Compile-Time Knowledge: A Technical Argument Against RAG</h1>
+      <p class="article-lead">RAG is a search engine wearing a language model as a hat. Trail compiles knowledge the way a brain consolidates memory — and the architectural difference shows up in latency, accuracy, provenance, and cost.</p>
+      <div class="article-meta">How Trail Works · trail by broberg.ai · April 15, 2026</div>
+      
+    </header><div class="prose"><h2>A technical argument against RAG</h2>
+<p>If you have built a retrieval-augmented generation system, you know the architecture intimately: an embedding model, a vector store, a top-k retrieval call, a context-window stuffing step, an LLM completion. Maybe a re-ranker. Maybe a small graph of MCP tools around it. The pipeline is mature, the libraries are good, and the pattern works for a class of problems.</p>
+<p>This article is about the class of problems where it does not work — and about the architectural alternative Trail implements, which we describe as compile-time knowledge.</p>
+<p>The short version is this: <strong>RAG performs work at query time. Trail performs work at ingest time.</strong> That single difference cascades through every other property of the system — latency, accuracy, provenance, cost, accumulation, and the size of the corpus you can usefully reason over. We will walk through each of these.</p>
+<p>We will also explain why this distinction is not novel. Brains do compile-time knowledge work. They have done it for hundreds of millions of years. RAG, despite the surface-level analogy to memory retrieval, is structurally closer to a search engine than to a cognitive system. The reason this matters is practical: certain workloads accumulate value over time only if the system itself accumulates structure over time, and RAG does not.</p>
+<h2>The mechanics of RAG, briefly</h2>
+<p>A standard RAG pipeline:</p>
+<pre><code>query → embed(query) → vector_store.search(top_k) → 
+  rerank(results) → format_context(results) → 
+  llm.complete(query + context) → response
+</code></pre>
+<p>Every component here is stateless across queries. The vector store contains document chunks, but those chunks are not connected to one another in any meaningful semantic structure — they are connected only by approximate proximity in embedding space. The LLM never accumulates understanding across queries. The context window is the only memory, and it dies when the request returns.</p>
+<p>When the corpus grows, RAG&#39;s behavior degrades in predictable ways:</p>
+<ul>
+<li><strong>Retrieval precision drops.</strong> With more chunks, semantic neighbors become noisier. Top-k retrieval starts surfacing irrelevant material. The standard fix is hybrid search (BM25 + vector) and re-ranking, which adds latency and cost.</li>
+<li><strong>Context window pressure increases.</strong> More candidates means harder filtering decisions. The system either retrieves too few (missing relevant material) or too many (diluting the LLM&#39;s attention).</li>
+<li><strong>Contradictions get retrieved together.</strong> If two sources disagree on a fact, RAG happily retrieves both and asks the LLM to reconcile them at query time, with no awareness that the contradiction exists or has been seen before.</li>
+<li><strong>Source updates do not propagate.</strong> If a source is corrected, the chunks remain in the vector store. There is no concept of &quot;this older fact is now stale because the source it came from has been updated.&quot;</li>
+</ul>
+<p>These are not bugs in any specific RAG implementation. They are consequences of doing knowledge work at query time, on raw fragments, with no persistent compiled artifact.</p>
+<h2>The mechanics of Trail&#39;s compile-time architecture</h2>
+<p>Trail flips the pipeline. Work happens at ingest time. Queries read from a compiled artifact:</p>
+<pre><code>ingest:
+  source → extract → chunk → 
+    propose_candidate(kind, payload, confidence) → 
+    queue → policy_check → 
+    [auto_approve | curator_review] → 
+    compile_to_wiki(touches 5-15 pages) → 
+    emit_wiki_event(payload, prev_event_id)
+
+query:
+  query → identify_relevant_pages → 
+    read_wiki(pages) → 
+    synthesize_with_citations → response
+</code></pre>
+<p>The unit of persistent storage is a <strong>wiki page</strong>, not a chunk. Wiki pages are markdown documents with structured <code>[[wiki-link]]</code> references to other pages, and stable <code>{#claim-xx}</code> anchors for individual claims. Each wiki page is the result of compiling N source chunks into a coherent narrative, with provenance attached to each claim.</p>
+<p>The compile step is where the work happens. When a new source enters the system, the compiler:</p>
+<ol>
+<li>Identifies which existing wiki pages are relevant</li>
+<li>Extracts new claims from the source</li>
+<li>Cross-references them against existing claims</li>
+<li>Detects contradictions explicitly</li>
+<li>Proposes updates to affected pages</li>
+<li>Routes proposals through the Curation Queue (auto-approved or human-reviewed based on policy)</li>
+<li>Writes the resulting wiki page change as an event with full payload</li>
+</ol>
+<p>This is more expensive than a RAG ingest. A RAG ingest is <code>chunk → embed → upsert</code>. A Trail ingest is closer to a small reasoning task per source. The trade-off is that the cost is paid once at ingest, not repeatedly at every query.</p>
+<h2>Where the costs actually live</h2>
+<p>A common objection: &quot;compile-time work is just shifted cost — you pay the LLM either way.&quot; This is true in the trivial sense and false in the practical sense.</p>
+<p>In RAG, every query incurs:</p>
+<ul>
+<li>Embedding cost on the query</li>
+<li>Vector search cost (cheap)</li>
+<li>Re-ranking cost (moderate, often LLM-based)</li>
+<li>LLM completion cost on <code>query + N retrieved chunks</code></li>
+</ul>
+<p>The LLM completion is the dominant cost, and it scales with <code>N × chunk_size</code>. A typical production RAG system pulls 10-20 chunks of 500-1000 tokens each, putting 5K-20K tokens of context into every completion. Multiply by query volume.</p>
+<p>In Trail, every query incurs:</p>
+<ul>
+<li>Identify relevant wiki pages (small classification task)</li>
+<li>Read those pages (typically 2-5 pages, much denser than raw chunks)</li>
+<li>LLM completion on <code>query + relevant pages</code></li>
+</ul>
+<p>The compiled wiki pages are an order of magnitude denser per token than raw chunks. A wiki page that took 50 source chunks to compile might fit in 1500 tokens because the LLM did the integration work at compile time — removing redundancy, resolving contradictions, structuring the narrative.</p>
+<p>The compile-time cost is paid once per source ingest, not once per query. For a corpus of 1000 sources answering 10K queries per month, the math favors compile-time architecture by a wide margin within weeks.</p>
+<h2>Why this maps onto how brains work</h2>
+<p>The biological precedent for compile-time knowledge work is extensive and well-studied. Three mechanisms in particular map cleanly onto Trail&#39;s architecture.</p>
+<p><strong>Memory consolidation.</strong> Human memory is not unitary. The hippocampus encodes new experiences in a fast, high-bandwidth format. During sleep — particularly slow-wave sleep — these encodings are replayed in compressed form and transferred to the neocortex, where they are integrated with existing long-term memory structures. This is not a backup operation. It is an active integration: contradictions are resolved, patterns are extracted, schemas are updated. By morning, yesterday&#39;s experience has been compiled into the existing structure of what you know.</p>
+<p>Trail&#39;s compile step is structurally analogous. Sources enter a fast queue (the curation candidates). A background process (auto-approval policy + scheduled lint) integrates them into the persistent wiki, resolving conflicts and updating cross-references. The wiki is the long-term store. Sources are the short-term encoding.</p>
+<p><strong>Synaptic plasticity.</strong> Knowledge in the brain is encoded in the strength of synaptic connections, not in the neurons themselves. A concept is a distributed pattern of connection weights across thousands or millions of neurons. Learning strengthens specific connections; forgetting weakens them. The Hebbian principle — &quot;neurons that fire together, wire together&quot; — operates at compile time, not query time. By the time you need to recall something, the connections are already in place.</p>
+<p>In Trail, the equivalent is the wiki link graph. The strength of a connection between two wiki pages is encoded in how many times they cross-reference each other, how many sources support the connection, and how often the curator has approved that connection. This structure is built at compile time. Queries traverse it; they do not construct it.</p>
+<p><strong>Spreading activation.</strong> When you think of a concept, related concepts activate automatically — even ones you did not consciously search for. Think &quot;hospital,&quot; and &quot;doctor,&quot; &quot;illness,&quot; &quot;ambulance,&quot; &quot;nurse&quot; are primed before you are aware of them. This happens because the connection weights between related concepts are already in place. Activation spreads through the network in milliseconds.</p>
+<p>RAG attempts to reproduce this with vector similarity search, but it does so at query time on raw chunks with no compiled structure. The result is approximate semantic neighborhood matching, not true associative activation. Trail&#39;s wiki link graph supports actual spreading activation because the connections are persistent and explicit. A query for &quot;stress&quot; doesn&#39;t just retrieve stress-related chunks; it can traverse to &quot;cortisol regulation,&quot; &quot;sleep disruption,&quot; and &quot;treatment protocols&quot; through compiled links.</p>
+<h2>The four properties that change</h2>
+<p>Compile-time architecture changes four measurable properties of a knowledge system.</p>
+<p><strong>Accumulation.</strong> In RAG, the value of the system grows linearly with corpus size — and degrades as retrieval precision drops. In Trail, the value grows superlinearly because each new source can update existing wiki pages, strengthen existing links, and resolve previous contradictions. The tenth source improves the wiki in light of the previous nine. The hundredth source benefits from the integrated structure of the previous ninety-nine.</p>
+<p>This is the property that matters most for use cases where knowledge should compound: clinical practice, legal research, scientific synthesis, organizational learning. RAG handles these poorly because it has no integration step. Trail handles them well because integration is the entire point of the architecture.</p>
+<p><strong>Provenance.</strong> RAG provenance is correlational: &quot;the model said X, and we retrieved chunk Y, so probably X came from Y.&quot; Trail provenance is structural: every claim on every wiki page is linked to the specific source revisions that support it. When a source is updated, the affected pages are flagged for re-review automatically. When a claim is contested, the lineage is explicit.</p>
+<p>For regulated domains — healthcare, legal, financial — this is not a nice-to-have. It is a baseline requirement that RAG cannot meet without bolting on a separate provenance layer that does the work Trail does natively.</p>
+<p><strong>Latency.</strong> Trail queries are faster because the work has already been done. A wiki page is denser than the equivalent raw chunks, so less context needs to be passed to the LLM. There is no re-ranking step. The retrieval step is identifying relevant pages, not searching a chunk space. Production Trail deployments typically see 30-60% latency reduction on equivalent queries compared to RAG baselines, and the gap grows as corpus size grows.</p>
+<p><strong>Cost.</strong> As described above, the cost calculus shifts from per-query to per-ingest. For high-query-volume use cases (which is most of them), this is a substantial reduction. The ingest cost is also more predictable — it is bounded by source volume, not user behavior.</p>
+<h2>What RAG is good for</h2>
+<p>To be fair: RAG is the right architecture for a class of workloads. If your corpus is large, frequently updated, and you primarily need lookup-style queries with no need for accumulated understanding, RAG works well. Customer support over product documentation, search across a code repository, Q&amp;A over recent news — these are RAG-shaped problems.</p>
+<p>The mistake is using RAG for problems that are not RAG-shaped: building a research wiki that should accumulate insight, maintaining clinical knowledge that should compound across patients, supporting expert practice where the depth of the integrated structure matters more than the speed of any individual lookup. These are compile-time problems being forced into a query-time architecture.</p>
+<p>Trail is built for the second class. RAG remains the right answer for the first.</p>
+<h2>The 1945 reference, briefly</h2>
+<p>Vannevar Bush&#39;s 1945 essay <em>As We May Think</em> described a hypothetical machine called the <strong>memex</strong> — a desk-sized device with microfilm storage and projected screens that would let a researcher build associative trails through their personal knowledge corpus. Bush&#39;s central argument was that the human mind operates by association, not by hierarchical classification, and that information systems built on classification (the library, the card catalog) were structurally mismatched with how thinking actually works.</p>
+<p>The microfilm reels in the base of Bush&#39;s memex desk — chosen as the visual mark for the Trail engine — were not a technical detail. They were the storage substrate for trails: sequences of frames linked in meaningful order, with annotations along the way. The Trail was the unit of compiled knowledge. The memex was the machine that compiled and held it.</p>
+<p>Eighty-one years later, language models are the integration mechanism Bush could not build. The LLM Wiki pattern, articulated by Andrej Karpathy in late 2025, is the modern restatement of Bush&#39;s idea: use the language model as a continuous compiler of knowledge, not as a query-time oracle. The wiki is the artifact. The model maintains it.</p>
+<p>Trail is the engine that does this work. The SaaS successor to memxcloud is the commercial product built on trail.</p>
+<h2>Implementation notes</h2>
+<p>A few specifics about how Trail&#39;s compile-time architecture is implemented:</p>
+<ul>
+<li><strong>The Curation Queue is the only write path</strong> to wiki documents. No code path bypasses it, including auto-approval. This guarantees that every wiki state change is auditable and reversible.</li>
+<li><strong>Wiki events are full-payload, not deltas.</strong> Each event records the complete new content of the affected page, not just the change. This makes time-travel queries trivial (replay events up to a timestamp) and ensures schema migrations don&#39;t lose history.</li>
+<li><strong>Stable claim anchors</strong> (<code>{#claim-xx}</code>) are emitted by the compiler at compile time and remain stable across re-compilations of the same source material. This makes it possible to add a first-class claims table later without re-parsing every wiki page.</li>
+<li><strong>Source ↔ wiki is a bidirectional index.</strong> Sources know which wiki pages they affect; wiki pages know which sources support each claim. Cascading invalidation is a database query, not an inference step.</li>
+<li><strong>Lint runs as a periodic background job.</strong> Stale page detection, contradiction surfacing, and gap analysis happen during quiet hours, not during user queries.</li>
+</ul>
+<p>These are the structural commitments that make compile-time architecture work. They are not optional features bolted onto a RAG pipeline. They are the architecture.</p>
+<h2>Closing</h2>
+<p>The argument against RAG is not that it does not work. It is that it works for the wrong shape of problem if your goal is accumulating knowledge over time. A system that performs all of its reasoning at query time, on raw fragments, with no persistent compiled structure, is structurally a search engine — regardless of how sophisticated the language model attached to it.</p>
+<p>The argument for compile-time knowledge is that integration, consolidation, and persistent structure are the actual value-producing operations in a knowledge system. Brains do this work continuously, mostly outside of conscious attention. Trail does it explicitly, in a queue-driven pipeline with full provenance.</p>
+<p>The infrastructure cost is higher per source. The infrastructure cost is dramatically lower per query. The accumulated value, over time, is qualitatively different.</p>
+<p>Bush saw this in 1945. Karpathy named it again in 2025. Trail implements it now.</p>
+<hr>
+<h3>Further reading</h3>
+<ul>
+<li>Vannevar Bush, <a href="https://www.theatlantic.com/magazine/archive/1945/07/as-we-may-think/303881/"><em>As We May Think</em></a> — <em>The Atlantic</em>, July 1945</li>
+<li>Andrej Karpathy, <em>LLM Wiki</em> — described publicly in October 2025</li>
+<li>Donald Hebb, <em>The Organization of Behavior</em>, 1949</li>
+<li>For Trail&#39;s architectural specification and API, see <a href="https://trail.broberg.ai/docs">trail.broberg.ai/docs</a></li>
+</ul>
+</div><div class="post-footer"><div class="post-tags"><a class="post-tag" href="/tags/architecture/">#architecture</a><a class="post-tag" href="/tags/rag/">#rag</a><a class="post-tag" href="/tags/knowledge-engineering/">#knowledge-engineering</a><a class="post-tag" href="/tags/systems-design/">#systems-design</a></div><a class="post-more" href="/trails/how-trail-works/">← MORE FROM HOW TRAIL WORKS</a></div></article>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="/uploads/memx-logo.svg" alt="trail" width="32" height="32">
+        <span>trail</span>
+      </div>
+      <div class="footer-links">
+        <a href="#">Twitter</a>
+        <a href="https://github.com/broberg-ai/trail">GitHub</a>
+        <a href="#">Status</a>
+      </div>
+      <div class="footer-copy">© 2026 Trail by broberg.ai. As we may think. Site built by <a href="https://webhouse.app" target="_blank" rel="noopener">@webhouse/cms</a></div>
+    </div>
+  </footer>
+  <script>
+(function(){
+  const canvas = document.getElementById('trail-graph');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let animationFrameId;
+  let particles = [];
+  const mouse = { x: null, y: null };
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    canvas.width = window.innerWidth * DPR;
+    canvas.height = window.innerHeight * DPR;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    initParticles();
+  }
+
+  function Particle(){
+    this.x = Math.random() * window.innerWidth;
+    this.y = Math.random() * window.innerHeight;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.baseRadius = Math.random() > 0.95 ? 3 : 1.5;
+    this.isAccent = Math.random() > 0.98;
+  }
+  Particle.prototype.update = function(){
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > window.innerWidth) this.vx = -this.vx;
+    if (this.y < 0 || this.y > window.innerHeight) this.vy = -this.vy;
+    if (mouse.x !== null && mouse.y !== null) {
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 100) { this.x -= dx * 0.01; this.y -= dy * 0.01; }
+    }
+  };
+  Particle.prototype.draw = function(){
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.baseRadius, 0, Math.PI * 2);
+    ctx.fillStyle = this.isAccent ? '#e8a87c' : '#1a1715';
+    if (this.isAccent) { ctx.shadowBlur = 10; ctx.shadowColor = '#e8a87c'; }
+    else { ctx.shadowBlur = 0; }
+    ctx.fill();
+  };
+
+  function initParticles(){
+    particles = [];
+    const count = Math.floor((window.innerWidth * window.innerHeight) / 15000);
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+  }
+
+  function drawLines(){
+    for (let i = 0; i < particles.length; i++){
+      for (let j = i + 1; j < particles.length; j++){
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 160){
+          const opacity = 1 - (d / 160);
+          ctx.beginPath();
+          if (particles[i].isAccent || particles[j].isAccent) {
+            ctx.strokeStyle = 'rgba(232, 168, 124, ' + (opacity * 0.5) + ')';
+          } else {
+            ctx.strokeStyle = 'rgba(26, 23, 21, ' + (opacity * 0.18) + ')';
+          }
+          ctx.lineWidth = 0.6;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animate(){
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (const p of particles){ p.update(); p.draw(); }
+    drawLines();
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseout', function(){ mouse.x = null; mouse.y = null; });
+
+  resize();
+  animate();
+})();
+</script>
+</body>
+</html>
