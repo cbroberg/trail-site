@@ -6,6 +6,7 @@
 
 - [Knowledge Infrastructure for the AI Era — trail](https://cbroberg.github.io/trail-site/trail-site/): Trail is a knowledge infrastructure engine that turns your sources into a persistent, compounding wiki — maintained by an LLM on your behalf. Realizing Vannevar Bush
 - [#architecture — trail](https://cbroberg.github.io/trail-site/trail-site/tags/architecture/): Content tagged architecture.
+- [#associative-structures — trail](https://cbroberg.github.io/trail-site/trail-site/tags/associative-structures/): Content tagged associative-structures.
 - [#comparison — trail](https://cbroberg.github.io/trail-site/trail-site/tags/comparison/): Content tagged comparison.
 - [#history — trail](https://cbroberg.github.io/trail-site/trail-site/tags/history/): Content tagged history.
 - [#hypertext — trail](https://cbroberg.github.io/trail-site/trail-site/tags/hypertext/): Content tagged hypertext.
