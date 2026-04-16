@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cbroberg.github.io/trail-site/trail-site/sitemap.xml
+Sitemap: https://trail.webhouse.app/sitemap.xml
