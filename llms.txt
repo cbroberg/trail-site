@@ -1,0 +1,32 @@
+# trail
+
+> 
+
+## Pages
+
+- [Knowledge Infrastructure for the AI Era — trail](https://cbroberg.github.io/trail-site/trail-site/): Trail is a knowledge infrastructure engine that turns your sources into a persistent, compounding wiki — maintained by an LLM on your behalf. Realizing Vannevar Bush
+- [#architecture — trail](https://cbroberg.github.io/trail-site/trail-site/tags/architecture/): Content tagged architecture.
+- [#comparison — trail](https://cbroberg.github.io/trail-site/trail-site/tags/comparison/): Content tagged comparison.
+- [#history — trail](https://cbroberg.github.io/trail-site/trail-site/tags/history/): Content tagged history.
+- [#hypertext — trail](https://cbroberg.github.io/trail-site/trail-site/tags/hypertext/): Content tagged hypertext.
+- [#knowledge-engineering — trail](https://cbroberg.github.io/trail-site/trail-site/tags/knowledge-engineering/): Content tagged knowledge-engineering.
+- [#knowledge-infrastructure — trail](https://cbroberg.github.io/trail-site/trail-site/tags/knowledge-infrastructure/): Content tagged knowledge-infrastructure.
+- [#material-elasticity — trail](https://cbroberg.github.io/trail-site/trail-site/tags/material-elasticity/): Content tagged material-elasticity.
+- [#memex — trail](https://cbroberg.github.io/trail-site/trail-site/tags/memex/): Content tagged memex.
+- [#microfilm — trail](https://cbroberg.github.io/trail-site/trail-site/tags/microfilm/): Content tagged microfilm.
+- [#neuroscience — trail](https://cbroberg.github.io/trail-site/trail-site/tags/neuroscience/): Content tagged neuroscience.
+- [#notebooklm — trail](https://cbroberg.github.io/trail-site/trail-site/tags/notebooklm/): Content tagged notebooklm.
+- [#product — trail](https://cbroberg.github.io/trail-site/trail-site/tags/product/): Content tagged product.
+- [#rag — trail](https://cbroberg.github.io/trail-site/trail-site/tags/rag/): Content tagged rag.
+- [#vannevar-bush — trail](https://cbroberg.github.io/trail-site/trail-site/tags/vannevar-bush/): Content tagged vannevar-bush.
+- [As We May Think](https://cbroberg.github.io/trail-site/trail-site/the-1945-concept/): In July 1945, an American engineer named Vannevar Bush sketched a machine that would change how humanity thinks about knowledge. He called it the memex. Eighty-one years later, we are finally building it.
+- [Dispatches — trail](https://cbroberg.github.io/trail-site/trail-site/trails/dispatches/): Releases, announcements, and observations from the broader knowledge-infrastructure landscape — what's shipping, what's shifting, what's worth watching.
+- [Field Notes — trail](https://cbroberg.github.io/trail-site/trail-site/trails/field-notes/): Engineering diaries from inside the Trail build — pipelines, benchmarks, incidents, and the everyday craft of shipping a knowledge engine.
+- [How a Brain Actually Remembers: Why Trail Compiles Knowledge Instead of Searching For It](https://cbroberg.github.io/trail-site/trail-site/trails/how-trail-works/how-a-brain-actually-remembers/): RAG treats knowledge like a filing cabinet. Brains do something fundamentally different — and so does trail. The architecture matters more than the model.
+- [How Trail Works — trail](https://cbroberg.github.io/trail-site/trail-site/trails/how-trail-works/): Essays on Trail's architecture — ingest-time compilation, cross-referenced Neurons, and the design choices that make a knowledge graph compound instead of fragment.
+- [Trails — trail](https://cbroberg.github.io/trail-site/trail-site/trails/): Essays, field notes, and dispatches from the trail knowledge engine.
+- [Research — trail](https://cbroberg.github.io/trail-site/trail-site/trails/research/): Deep dives into adjacent systems, benchmarks, and comparisons — from MemPalace and Mem0 to Karpathy's LLM Wiki and the long tail of RAG variants.
+- [Trail and NotebookLM: Same Ethos, Different Artifact](https://cbroberg.github.io/trail-site/trail-site/trails/research/trail-and-notebooklm/): NotebookLM proved source-grounded ingest-time tools can ship to millions. Trail shares that ethos and diverges on one question: what the system leaves behind.
+- [As We May Think](https://cbroberg.github.io/trail-site/trail-site/trails/the-1945-concept/): In July 1945, an American engineer named Vannevar Bush sketched a machine that would change how humanity thinks about knowledge. He called it the memex. Eighty-one years later, we are finally building it.
+
+Built with [webhouse.app](https://webhouse.app)

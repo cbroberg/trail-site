@@ -1,0 +1,16 @@
+{
+  "name": "trail",
+  "short_name": "trail",
+  "description": "",
+  "start_url": "/trail-site/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/trail-site/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
