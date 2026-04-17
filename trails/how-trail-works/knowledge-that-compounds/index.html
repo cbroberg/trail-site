@@ -451,7 +451,7 @@ body[data-menu-open="true"] { overflow: hidden; }
   text-align: center;
   color: var(--fg); /* inline SVGs use currentColor so strokes/text swap with theme */
 }
-.prose figure svg { max-width: 100%; height: auto; }
+.prose figure svg { width: 100%; height: auto; display: block; }
 .prose figcaption {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
@@ -697,6 +697,70 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>A compile-time system does the work in advance. Sources are read, integrated, cross-referenced, and compiled into structured knowledge pages as they enter the system. When a user asks a question, the system reads from already-integrated knowledge rather than searching raw fragments. The structure grows and improves with every source added.</p>
 <p>The analogy to human cognition is direct. When you ask a domain expert a question, they do not search their memory for relevant fragments. They draw on knowledge they have already integrated — knowledge that was built up over years of reading, practice, and reflection. The integration happened over time, mostly while they were not actively answering questions. The answer comes quickly and coherently because the work was done in advance.</p>
 <p>A search-time AI system is closer to a research assistant who Googles every question. A compile-time system is closer to the expert.</p>
+<p><figure class="cms-svg cms-svg--knowledge-compounds-curve"><svg viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Knowledge usefulness as a function of sources ingested: RAG stays flat while Trail compounds superlinearly">
+  <!-- Title -->
+  <text x="420" y="45" font-family="monospace" font-size="14" fill="currentColor" text-anchor="middle" opacity="0.6" letter-spacing="1.5">WHAT EACH NEW SOURCE BUYS YOU</text>
+
+  <!-- Axes -->
+  <line x1="90" y1="330" x2="780" y2="330" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="90" y1="85"  x2="90"  y2="330" stroke="currentColor" stroke-width="1.2"/>
+
+  <!-- Axis labels -->
+  <text x="36"  y="95"  font-family="monospace" font-size="12" fill="currentColor" opacity="0.7">useful-</text>
+  <text x="36"  y="110" font-family="monospace" font-size="12" fill="currentColor" opacity="0.7">ness</text>
+  <text x="435" y="365" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" letter-spacing="0.5">SOURCES INGESTED OVER TIME</text>
+
+  <!-- RAG: flat horizontal -->
+  <line x1="90" y1="265" x2="780" y2="265" stroke="currentColor" stroke-width="1.8"/>
+  <g fill="currentColor">
+    <circle cx="160" cy="265" r="3"/>
+    <circle cx="260" cy="265" r="3"/>
+    <circle cx="360" cy="265" r="3"/>
+    <circle cx="460" cy="265" r="3"/>
+    <circle cx="560" cy="265" r="3"/>
+    <circle cx="660" cy="265" r="3"/>
+    <circle cx="740" cy="265" r="3"/>
+  </g>
+  <text x="790" y="269" font-family="monospace" font-size="13" fill="currentColor" text-anchor="start" font-weight="bold">RAG</text>
+  <text x="790" y="285" font-family="monospace" font-size="11" fill="currentColor" text-anchor="start" opacity="0.55">flat</text>
+
+  <!-- TRAIL: exponential / superlinear upward -->
+  <path d="M 90 300 Q 200 290 300 260 Q 400 220 500 170 Q 600 125 700 100 L 780 92"
+        fill="none" stroke="#e8a87c" stroke-width="2"/>
+  <g fill="#e8a87c">
+    <circle cx="160" cy="295" r="3.5"/>
+    <circle cx="260" cy="280" r="3.5"/>
+    <circle cx="360" cy="240" r="3.5"/>
+    <circle cx="460" cy="195" r="3.5"/>
+    <circle cx="560" cy="145" r="3.5"/>
+    <circle cx="660" cy="115" r="3.5"/>
+    <circle cx="740" cy="95"  r="4.5"/>
+  </g>
+  <!-- halo on latest point -->
+  <circle cx="740" cy="95" r="9"  fill="none" stroke="#e8a87c" stroke-width="0.7" opacity="0.5"/>
+  <circle cx="740" cy="95" r="14" fill="none" stroke="#e8a87c" stroke-width="0.4" opacity="0.3"/>
+
+  <text x="790" y="100" font-family="monospace" font-size="13" fill="#e8a87c" text-anchor="start" font-weight="bold">Trail</text>
+  <text x="790" y="116" font-family="monospace" font-size="11" fill="currentColor" text-anchor="start" opacity="0.55">compounds</text>
+
+  <!-- Annotations -->
+  <g font-family="monospace" font-size="11" fill="currentColor" opacity="0.55" text-anchor="middle">
+    <text x="180" y="255">each query re-does the same work</text>
+    <text x="500" y="225">each source updates every related Neuron</text>
+  </g>
+
+  <!-- X axis tick labels -->
+  <g font-family="monospace" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">
+    <text x="160" y="345">10</text>
+    <text x="360" y="345">100</text>
+    <text x="560" y="345">1 000</text>
+    <text x="740" y="345">10 000</text>
+  </g>
+
+  <!-- Caption -->
+  <text x="420" y="405" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.5" letter-spacing="0.5">the tenth source improves the Neurons in light of the previous nine · the thousandth even more</text>
+</svg>
+<figcaption>RAG gets no better as you feed it more sources. Trail accelerates because each new source updates every Neuron it touches.</figcaption></figure></p>
 <h2>Where this matters strategically</h2>
 <p>Four properties of compile-time architecture have direct strategic consequences.</p>
 <p><strong>Knowledge accumulates as a defensible asset.</strong> Most AI investments today produce no durable artifact. The vector database underlying a RAG system is a commodity asset — same chunks, same embeddings, same retrieval. Switch vendors and you replace it in a week. A compiled Neurons, by contrast, is a structured knowledge asset specific to your organization. It contains the integrated understanding that emerged from your sources, your curators, your decisions. It compounds in value over time. It is not portable to a competitor without the same compilation effort.</p>
@@ -714,6 +778,71 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p><strong>What happens when a source is updated?</strong> A compile-time system flags the affected pages for re-review and recompilation. A search-time system silently retains the older chunks and may continue to retrieve them. Ask the vendor to walk through this scenario explicitly.</p>
 <p><strong>Where does the human curator fit?</strong> Compile-time architectures have a first-class role for human review of proposed changes — usually a queue of candidates that the curator approves, edits, or rejects. Search-time systems have no such role because there is nothing to review; the system retrieves and answers in one step. If the vendor&#39;s answer to &quot;how does my expert correct the system?&quot; is &quot;we retrain the embeddings&quot; or &quot;we add to the prompt,&quot; that is search-time architecture.</p>
 <p>These three questions cannot be faked in a sales conversation. Either the architecture supports them or it does not.</p>
+<p><figure class="cms-svg cms-svg--vendor-decision"><svg viewBox="0 0 840 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A 2x2 matrix for choosing between RAG and Trail based on whether the knowledge should accumulate and whether a persistent artifact is wanted">
+  <!-- Title -->
+  <text x="420" y="45" font-family="monospace" font-size="14" fill="currentColor" text-anchor="middle" opacity="0.6" letter-spacing="1.5">WHEN TO PICK WHICH</text>
+
+  <!-- Matrix axes -->
+  <!-- vertical axis label (rotated left) -->
+  <text x="60" y="270" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" letter-spacing="0.5" transform="rotate(-90 60 270)">KNOWLEDGE ACCUMULATES</text>
+
+  <!-- horizontal axis label (bottom) -->
+  <text x="470" y="500" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" letter-spacing="0.5">PERSISTENT ARTIFACT WANTED</text>
+
+  <!-- Matrix frame -->
+  <g fill="none" stroke="currentColor" stroke-width="1.2">
+    <rect x="120" y="90" width="700" height="380"/>
+    <line x1="120" y1="280" x2="820" y2="280"/>
+    <line x1="470" y1="90"  x2="470" y2="470"/>
+  </g>
+
+  <!-- Axis tick labels -->
+  <g font-family="monospace" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">
+    <text x="90"  y="185">YES</text>
+    <text x="90"  y="380">NO</text>
+    <text x="295" y="485">NO</text>
+    <text x="645" y="485">YES</text>
+  </g>
+
+  <!-- Top-right: TRAIL (amber fill + halo) -->
+  <rect x="485" y="105" width="320" height="160" fill="#e8a87c" opacity="0.12"/>
+  <g font-family="monospace" text-anchor="middle">
+    <text x="645" y="165" font-size="22" fill="#e8a87c" font-weight="bold" letter-spacing="2">TRAIL</text>
+    <text x="645" y="195" font-size="13" fill="currentColor" opacity="0.75">clinical knowledge · research</text>
+    <text x="645" y="212" font-size="13" fill="currentColor" opacity="0.75">org-wide docs · ops playbooks</text>
+    <text x="645" y="238" font-size="12" fill="currentColor" opacity="0.55">source-grounded · persistent</text>
+    <text x="645" y="253" font-size="12" fill="currentColor" opacity="0.55">the Neuron graph grows with use</text>
+  </g>
+
+  <!-- Top-left: "compile without persistent artifact" edge case -->
+  <g font-family="monospace" text-anchor="middle">
+    <text x="295" y="170" font-size="14" fill="currentColor" opacity="0.55" letter-spacing="0.5">SESSION TOOLS</text>
+    <text x="295" y="195" font-size="12" fill="currentColor" opacity="0.4">e.g. NotebookLM</text>
+    <text x="295" y="225" font-size="11" fill="currentColor" opacity="0.4">accumulates within a session</text>
+    <text x="295" y="240" font-size="11" fill="currentColor" opacity="0.4">but the artifact is thrown away</text>
+  </g>
+
+  <!-- Bottom-right: "persist, but don't compound" — structured doc store -->
+  <g font-family="monospace" text-anchor="middle">
+    <text x="645" y="355" font-size="14" fill="currentColor" opacity="0.55" letter-spacing="0.5">STATIC DOC STORE</text>
+    <text x="645" y="380" font-size="12" fill="currentColor" opacity="0.4">read the source as-is</text>
+    <text x="645" y="405" font-size="11" fill="currentColor" opacity="0.4">the sources are the answer</text>
+    <text x="645" y="420" font-size="11" fill="currentColor" opacity="0.4">nothing needs synthesizing</text>
+  </g>
+
+  <!-- Bottom-left: RAG -->
+  <g font-family="monospace" text-anchor="middle">
+    <text x="295" y="365" font-size="22" fill="currentColor" font-weight="bold" letter-spacing="2">RAG</text>
+    <text x="295" y="395" font-size="13" fill="currentColor" opacity="0.75">customer-support chat</text>
+    <text x="295" y="412" font-size="13" fill="currentColor" opacity="0.75">product-doc Q&amp;A</text>
+    <text x="295" y="438" font-size="12" fill="currentColor" opacity="0.55">bounded corpus · Q&amp;A style</text>
+    <text x="295" y="453" font-size="12" fill="currentColor" opacity="0.55">each query independent</text>
+  </g>
+
+  <!-- caption -->
+  <!-- (axis labels are the caption) -->
+</svg>
+<figcaption>A two-axis matrix. Trail is the answer when knowledge should both accumulate and leave a persistent, queryable artifact — which is most of the interesting cases.</figcaption></figure></p>
 <h2>Where search-time is the right answer</h2>
 <p>To be balanced: search-time systems are the right architecture for some workloads. If your use case is question-answering over a static reference corpus, with no need for accumulation or expert correction, RAG works well. Examples include customer support chat over product documentation, code search across a repository, and Q&amp;A over recent news.</p>
 <p>The mistake is using search-time architecture for problems that require accumulation. Building a research wiki for a clinical practice. Maintaining institutional knowledge in a consulting firm. Supporting expert decision-making in any domain where the depth of integrated understanding matters more than the speed of any individual lookup. These are compile-time problems being forced into search-time architectures because RAG was the easiest pattern to deploy in 2023-2024.</p>
