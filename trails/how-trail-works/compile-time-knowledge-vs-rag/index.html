@@ -715,24 +715,24 @@ body[data-menu-open="true"] { overflow: hidden; }
     propose_candidate(kind, payload, confidence) → 
     queue → policy_check → 
     [auto_approve | curator_review] → 
-    compile_to_wiki(touches 5-15 pages) → 
-    emit_wiki_event(payload, prev_event_id)
+    compile_to_neuron(touches 5-15 pages) → 
+    emit_neuron_event(payload, prev_event_id)
 
 query:
   query → identify_relevant_pages → 
-    read_wiki(pages) → 
+    read_neurons(ids) → 
     synthesize_with_citations → response
 </code></pre>
-<p>The unit of persistent storage is a <strong>wiki page</strong>, not a chunk. Wiki pages are markdown documents with structured <code>[[wiki-link]]</code> references to other pages, and stable <code>{#claim-xx}</code> anchors for individual claims. Each wiki page is the result of compiling N source chunks into a coherent narrative, with provenance attached to each claim.</p>
+<p>The unit of persistent storage is a <strong>Neuron</strong>, not a chunk. Neurons are markdown documents with structured <code>[[neuron-link]]</code> references to other pages, and stable <code>{#claim-xx}</code> anchors for individual claims. Each Neuron is the result of compiling N source chunks into a coherent narrative, with provenance attached to each claim.</p>
 <p>The compile step is where the work happens. When a new source enters the system, the compiler:</p>
 <ol>
-<li>Identifies which existing wiki pages are relevant</li>
+<li>Identifies which existing Neurons are relevant</li>
 <li>Extracts new claims from the source</li>
 <li>Cross-references them against existing claims</li>
 <li>Detects contradictions explicitly</li>
 <li>Proposes updates to affected pages</li>
 <li>Routes proposals through the Curation Queue (auto-approved or human-reviewed based on policy)</li>
-<li>Writes the resulting wiki page change as an event with full payload</li>
+<li>Writes the resulting Neuron change as an event with full payload</li>
 </ol>
 <p>This is more expensive than a RAG ingest. A RAG ingest is <code>chunk → embed → upsert</code>. A Trail ingest is closer to a small reasoning task per source. The trade-off is that the cost is paid once at ingest, not repeatedly at every query.</p>
 <h2>Where the costs actually live</h2>
@@ -747,27 +747,27 @@ query:
 <p>The LLM completion is the dominant cost, and it scales with <code>N × chunk_size</code>. A typical production RAG system pulls 10-20 chunks of 500-1000 tokens each, putting 5K-20K tokens of context into every completion. Multiply by query volume.</p>
 <p>In Trail, every query incurs:</p>
 <ul>
-<li>Identify relevant wiki pages (small classification task)</li>
+<li>Identify relevant Neurons (small classification task)</li>
 <li>Read those pages (typically 2-5 pages, much denser than raw chunks)</li>
 <li>LLM completion on <code>query + relevant pages</code></li>
 </ul>
-<p>The compiled wiki pages are an order of magnitude denser per token than raw chunks. A wiki page that took 50 source chunks to compile might fit in 1500 tokens because the LLM did the integration work at compile time — removing redundancy, resolving contradictions, structuring the narrative.</p>
+<p>The compiled Neurons are an order of magnitude denser per token than raw chunks. A Neuron that took 50 source chunks to compile might fit in 1500 tokens because the LLM did the integration work at compile time — removing redundancy, resolving contradictions, structuring the narrative.</p>
 <p>The compile-time cost is paid once per source ingest, not once per query. For a corpus of 1000 sources answering 10K queries per month, the math favors compile-time architecture by a wide margin within weeks.</p>
 <h2>Why this maps onto how brains work</h2>
 <p>The biological precedent for compile-time knowledge work is extensive and well-studied. Three mechanisms in particular map cleanly onto Trail&#39;s architecture.</p>
 <p><strong>Memory consolidation.</strong> Human memory is not unitary. The hippocampus encodes new experiences in a fast, high-bandwidth format. During sleep — particularly slow-wave sleep — these encodings are replayed in compressed form and transferred to the neocortex, where they are integrated with existing long-term memory structures. This is not a backup operation. It is an active integration: contradictions are resolved, patterns are extracted, schemas are updated. By morning, yesterday&#39;s experience has been compiled into the existing structure of what you know.</p>
-<p>Trail&#39;s compile step is structurally analogous. Sources enter a fast queue (the curation candidates). A background process (auto-approval policy + scheduled lint) integrates them into the persistent wiki, resolving conflicts and updating cross-references. The wiki is the long-term store. Sources are the short-term encoding.</p>
+<p>Trail&#39;s compile step is structurally analogous. Sources enter a fast queue (the curation candidates). A background process (auto-approval policy + scheduled lint) integrates them into the persistent Neurons, resolving conflicts and updating cross-references. The Neurons are the long-term store. Sources are the short-term encoding.</p>
 <p><strong>Synaptic plasticity.</strong> Knowledge in the brain is encoded in the strength of synaptic connections, not in the neurons themselves. A concept is a distributed pattern of connection weights across thousands or millions of neurons. Learning strengthens specific connections; forgetting weakens them. The Hebbian principle — &quot;neurons that fire together, wire together&quot; — operates at compile time, not query time. By the time you need to recall something, the connections are already in place.</p>
-<p>In Trail, the equivalent is the wiki link graph. The strength of a connection between two wiki pages is encoded in how many times they cross-reference each other, how many sources support the connection, and how often the curator has approved that connection. This structure is built at compile time. Queries traverse it; they do not construct it.</p>
+<p>In Trail, the equivalent is the Neuron-graph. The strength of a connection between two Neurons is encoded in how many times they cross-reference each other, how many sources support the connection, and how often the curator has approved that connection. This structure is built at compile time. Queries traverse it; they do not construct it.</p>
 <p><strong>Spreading activation.</strong> When you think of a concept, related concepts activate automatically — even ones you did not consciously search for. Think &quot;hospital,&quot; and &quot;doctor,&quot; &quot;illness,&quot; &quot;ambulance,&quot; &quot;nurse&quot; are primed before you are aware of them. This happens because the connection weights between related concepts are already in place. Activation spreads through the network in milliseconds.</p>
-<p>RAG attempts to reproduce this with vector similarity search, but it does so at query time on raw chunks with no compiled structure. The result is approximate semantic neighborhood matching, not true associative activation. Trail&#39;s wiki link graph supports actual spreading activation because the connections are persistent and explicit. A query for &quot;stress&quot; doesn&#39;t just retrieve stress-related chunks; it can traverse to &quot;cortisol regulation,&quot; &quot;sleep disruption,&quot; and &quot;treatment protocols&quot; through compiled links.</p>
+<p>RAG attempts to reproduce this with vector similarity search, but it does so at query time on raw chunks with no compiled structure. The result is approximate semantic neighborhood matching, not true associative activation. Trail&#39;s Neuron-graph supports actual spreading activation because the connections are persistent and explicit. A query for &quot;stress&quot; doesn&#39;t just retrieve stress-related chunks; it can traverse to &quot;cortisol regulation,&quot; &quot;sleep disruption,&quot; and &quot;treatment protocols&quot; through compiled links.</p>
 <h2>The four properties that change</h2>
 <p>Compile-time architecture changes four measurable properties of a knowledge system.</p>
-<p><strong>Accumulation.</strong> In RAG, the value of the system grows linearly with corpus size — and degrades as retrieval precision drops. In Trail, the value grows superlinearly because each new source can update existing wiki pages, strengthen existing links, and resolve previous contradictions. The tenth source improves the wiki in light of the previous nine. The hundredth source benefits from the integrated structure of the previous ninety-nine.</p>
+<p><strong>Accumulation.</strong> In RAG, the value of the system grows linearly with corpus size — and degrades as retrieval precision drops. In Trail, the value grows superlinearly because each new source can update existing Neurons, strengthen existing links, and resolve previous contradictions. The tenth source improves the Neurons in light of the previous nine. The hundredth source benefits from the integrated structure of the previous ninety-nine.</p>
 <p>This is the property that matters most for use cases where knowledge should compound: clinical practice, legal research, scientific synthesis, organizational learning. RAG handles these poorly because it has no integration step. Trail handles them well because integration is the entire point of the architecture.</p>
-<p><strong>Provenance.</strong> RAG provenance is correlational: &quot;the model said X, and we retrieved chunk Y, so probably X came from Y.&quot; Trail provenance is structural: every claim on every wiki page is linked to the specific source revisions that support it. When a source is updated, the affected pages are flagged for re-review automatically. When a claim is contested, the lineage is explicit.</p>
+<p><strong>Provenance.</strong> RAG provenance is correlational: &quot;the model said X, and we retrieved chunk Y, so probably X came from Y.&quot; Trail provenance is structural: every claim on every Neuron is linked to the specific source revisions that support it. When a source is updated, the affected pages are flagged for re-review automatically. When a claim is contested, the lineage is explicit.</p>
 <p>For regulated domains — healthcare, legal, financial — this is not a nice-to-have. It is a baseline requirement that RAG cannot meet without bolting on a separate provenance layer that does the work Trail does natively.</p>
-<p><strong>Latency.</strong> Trail queries are faster because the work has already been done. A wiki page is denser than the equivalent raw chunks, so less context needs to be passed to the LLM. There is no re-ranking step. The retrieval step is identifying relevant pages, not searching a chunk space. Production Trail deployments typically see 30-60% latency reduction on equivalent queries compared to RAG baselines, and the gap grows as corpus size grows.</p>
+<p><strong>Latency.</strong> Trail queries are faster because the work has already been done. A Neuron is denser than the equivalent raw chunks, so less context needs to be passed to the LLM. There is no re-ranking step. The retrieval step is identifying relevant pages, not searching a chunk space. Production Trail deployments typically see 30-60% latency reduction on equivalent queries compared to RAG baselines, and the gap grows as corpus size grows.</p>
 <p><strong>Cost.</strong> As described above, the cost calculus shifts from per-query to per-ingest. For high-query-volume use cases (which is most of them), this is a substantial reduction. The ingest cost is also more predictable — it is bounded by source volume, not user behavior.</p>
 <h2>What RAG is good for</h2>
 <p>To be fair: RAG is the right architecture for a class of workloads. If your corpus is large, frequently updated, and you primarily need lookup-style queries with no need for accumulated understanding, RAG works well. Customer support over product documentation, search across a code repository, Q&amp;A over recent news — these are RAG-shaped problems.</p>
@@ -776,15 +776,15 @@ query:
 <h2>The 1945 reference, briefly</h2>
 <p>Vannevar Bush&#39;s 1945 essay <em>As We May Think</em> described a hypothetical machine called the <strong>memex</strong> — a desk-sized device with microfilm storage and projected screens that would let a researcher build associative trails through their personal knowledge corpus. Bush&#39;s central argument was that the human mind operates by association, not by hierarchical classification, and that information systems built on classification (the library, the card catalog) were structurally mismatched with how thinking actually works.</p>
 <p>The microfilm reels in the base of Bush&#39;s memex desk — chosen as the visual mark for the Trail engine — were not a technical detail. They were the storage substrate for trails: sequences of frames linked in meaningful order, with annotations along the way. The Trail was the unit of compiled knowledge. The memex was the machine that compiled and held it.</p>
-<p>Eighty-one years later, language models are the integration mechanism Bush could not build. The LLM Wiki pattern, articulated by Andrej Karpathy in late 2025, is the modern restatement of Bush&#39;s idea: use the language model as a continuous compiler of knowledge, not as a query-time oracle. The wiki is the artifact. The model maintains it.</p>
+<p>Eighty-one years later, language models are the integration mechanism Bush could not build. The LLM Wiki pattern, articulated by Andrej Karpathy in late 2025, is the modern restatement of Bush&#39;s idea: use the language model as a continuous compiler of knowledge, not as a query-time oracle. The Neurons are the artifact. The model maintains it.</p>
 <p>Trail is the engine that does this work. The SaaS successor to memxcloud is the commercial product built on trail.</p>
 <h2>Implementation notes</h2>
 <p>A few specifics about how Trail&#39;s compile-time architecture is implemented:</p>
 <ul>
-<li><strong>The Curation Queue is the only write path</strong> to wiki documents. No code path bypasses it, including auto-approval. This guarantees that every wiki state change is auditable and reversible.</li>
+<li><strong>The Curation Queue is the only write path</strong> to Neurons. No code path bypasses it, including auto-approval. This guarantees that every Neuron state change is auditable and reversible.</li>
 <li><strong>Wiki events are full-payload, not deltas.</strong> Each event records the complete new content of the affected page, not just the change. This makes time-travel queries trivial (replay events up to a timestamp) and ensures schema migrations don&#39;t lose history.</li>
-<li><strong>Stable claim anchors</strong> (<code>{#claim-xx}</code>) are emitted by the compiler at compile time and remain stable across re-compilations of the same source material. This makes it possible to add a first-class claims table later without re-parsing every wiki page.</li>
-<li><strong>Source ↔ wiki is a bidirectional index.</strong> Sources know which wiki pages they affect; wiki pages know which sources support each claim. Cascading invalidation is a database query, not an inference step.</li>
+<li><strong>Stable claim anchors</strong> (<code>{#claim-xx}</code>) are emitted by the compiler at compile time and remain stable across re-compilations of the same source material. This makes it possible to add a first-class claims table later without re-parsing every Neuron.</li>
+<li><strong>Source ↔ Neuron is a bidirectional index.</strong> Sources know which Neurons they affect; Neurons know which sources support each claim. Cascading invalidation is a database query, not an inference step.</li>
 <li><strong>Lint runs as a periodic background job.</strong> Stale page detection, contradiction surfacing, and gap analysis happen during quiet hours, not during user queries.</li>
 </ul>
 <p>These are the structural commitments that make compile-time architecture work. They are not optional features bolted onto a RAG pipeline. They are the architecture.</p>

@@ -691,9 +691,9 @@ body[data-menu-open="true"] { overflow: hidden; }
     </header><div class="prose"><h2>The gate is the architecture</h2>
 <p>Every persistent knowledge system eventually has to answer the same question: what gets written down, and on whose authority?</p>
 <p>For a brain, the answer is not conscious. You do not sit down each evening and decide which of the day&#39;s experiences to encode into long-term memory. Something in you decides, below the level of attention, and what gets through is the substrate of everything you will later think of as your understanding of the world. What gets filtered out is, by definition, unrecoverable — you will never know what you nearly remembered.</p>
-<p>For a knowledge infrastructure engine, the same question becomes an explicit design problem. Trail compiles sources into a cross-referenced wiki maintained by a language model. If every candidate that the compiler proposes were admitted without scrutiny, the wiki would drift into incoherence within weeks. Contradictions would accumulate. Low-confidence speculation would be indistinguishable from verified claims. The system would look like it was learning, but what it was actually doing was accreting noise.</p>
-<p>So Trail has a gate. Three filters on that gate, to be precise. They sit between the candidate queue (F17) and the wiki itself, and they decide — per candidate, per event — whether a piece of proposed knowledge gets auto-approved, gets raised to a human curator, or gets rejected outright. Today the first filter is live in <code>packages/core/src/queue/policy.ts</code>. The second ships in F19 iteration 2. The third depends on F32, the background lint pass that surfaces contradictions across sources.</p>
-<p><figure class="cms-svg cms-svg--three-filters-gate"><svg viewBox="20 30 800 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three filters on the gate: candidate queue flows through trusted pipeline, confidence threshold, and no-contradictions checks into the wiki">
+<p>For a knowledge infrastructure engine, the same question becomes an explicit design problem. Trail compiles sources into a cross-referenced graph of Neurons maintained by a language model. If every candidate that the compiler proposes were admitted without scrutiny, the graph would drift into incoherence within weeks. Contradictions would accumulate. Low-confidence speculation would be indistinguishable from verified claims. The system would look like it was learning, but what it was actually doing was accreting noise.</p>
+<p>So Trail has a gate. Three filters on that gate, to be precise. They sit between the candidate queue and the Neurons themselves, and they decide — per candidate, per event — whether a piece of proposed knowledge gets auto-approved, gets raised to a human curator, or gets rejected outright. Today the first filter is live in <code>packages/core/src/queue/policy.ts</code>. The second is queued for a coming iteration. The third depends on a background lint pass that surfaces contradictions across sources.</p>
+<p><figure class="cms-svg cms-svg--three-filters-gate"><svg viewBox="20 30 800 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three filters on the gate: candidate queue flows through trusted pipeline, confidence threshold, and no-contradictions checks into a Neuron">
   <!-- Candidate queue (left) -->
   <g fill="none" stroke="currentColor" stroke-width="1">
     <rect x="40"  y="170" width="70" height="18"/>
@@ -710,7 +710,7 @@ body[data-menu-open="true"] { overflow: hidden; }
     <line x1="50" y1="280" x2="88" y2="280"/>
   </g>
   <text x="75" y="160" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" font-weight="bold" letter-spacing="0.5">CANDIDATES</text>
-  <text x="75" y="305" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">F17 · queue</text>
+  <text x="75" y="305" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">proposed by LLM</text>
 
   <!-- Three sequential gates (dashed vertical lines) -->
   <g stroke="currentColor" stroke-width="1.2" stroke-dasharray="5,4">
@@ -744,9 +744,9 @@ body[data-menu-open="true"] { overflow: hidden; }
 
   <!-- Curator queue (bottom, spans across) -->
   <rect x="160" y="385" width="460" height="22" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="3,3"/>
-  <text x="390" y="400" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" letter-spacing="0.5">CURATOR REVIEW · F19</text>
+  <text x="390" y="400" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" letter-spacing="0.5">CURATOR REVIEW</text>
 
-  <!-- Amber path: one candidate flowing through all three gates into wiki -->
+  <!-- Amber path: one candidate flowing through all three gates into a Neuron -->
   <g stroke="#e8a87c" stroke-width="1.8" fill="none">
     <path d="M 110 229 L 220 229"/>
     <path d="M 220 229 L 390 229"/>
@@ -781,14 +781,14 @@ body[data-menu-open="true"] { overflow: hidden; }
     <line x1="720" y1="260" x2="780" y2="260"/>
     <line x1="720" y1="275" x2="788" y2="275"/>
   </g>
-  <text x="755" y="160" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" font-weight="bold" letter-spacing="0.5">WIKI</text>
+  <text x="755" y="160" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" font-weight="bold" letter-spacing="0.5">NEURON</text>
   <text x="755" y="305" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">persistent</text>
 
   <!-- Caption -->
   <text x="420" y="70" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">THREE FILTERS ON THE GATE</text>
   <text x="420" y="85" font-family="monospace" font-size="9"  fill="currentColor" text-anchor="middle" opacity="0.4">every candidate passes all three — or goes to a human</text>
 </svg>
-<figcaption>Candidates flow through three sequential filters. What passes all three enters the wiki; what fails any one is routed to a human curator.</figcaption></figure></p>
+<figcaption>Candidates flow through three sequential filters. What passes all three is written as a Neuron; what fails any one is routed to a human curator.</figcaption></figure></p>
 <p>What is interesting — what this essay is about — is that these three filters are not a set of engineering heuristics chosen for convenience. They are, almost exactly, the three filters that Bandler and Grinder named in 1975 when they wrote <em>The Structure of Magic</em> and founded what became Neuro-Linguistic Programming. They are the filters that thalamic gating, the reticular activating system, and the prefrontal cortex implement biologically. They are, in a different vocabulary, the filters Karl Friston&#39;s free-energy principle formalises as the way a predictive brain keeps itself coherent.</p>
 <p>The correspondence is not metaphor. It is structural, and it gives us a way to reason about why Trail&#39;s architecture has the shape it does.</p>
 <h2>What NLP actually said</h2>
@@ -822,7 +822,7 @@ body[data-menu-open="true"] { overflow: hidden; }
     <text x="420" y="80"  font-size="10" font-weight="bold" letter-spacing="1">BRAIN</text>
     <text x="420" y="94"  font-size="8"  opacity="0.55">thalamic gate · cortex</text>
     <text x="690" y="80"  font-size="10" font-weight="bold" letter-spacing="1">TRAIL</text>
-    <text x="690" y="94"  font-size="8"  opacity="0.55">policy engine · F17 · F19 · F32</text>
+    <text x="690" y="94"  font-size="8"  opacity="0.55">policy engine</text>
   </g>
 
   <!-- Header underline -->
@@ -878,7 +878,7 @@ body[data-menu-open="true"] { overflow: hidden; }
     <text x="420" y="278" font-size="10" letter-spacing="0.5">PREFRONTAL RECON</text>
     <text x="420" y="292" font-size="8"  opacity="0.6">cognitive dissonance · ACC</text>
     <text x="690" y="278" font-size="10" letter-spacing="0.5">NO CONTRADICTIONS</text>
-    <text x="690" y="292" font-size="8"  opacity="0.6">cross-check vs. wiki</text>
+    <text x="690" y="292" font-size="8"  opacity="0.6">cross-check vs. Neurons</text>
   </g>
   <g stroke="#e8a87c" stroke-width="1" stroke-dasharray="2,2">
     <line x1="240" y1="280" x2="330" y2="280"/>
@@ -897,13 +897,13 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>The first filter is already in production. <code>shouldAutoApprove(candidate)</code> in <code>packages/core/src/queue/policy.ts</code> returns <code>true</code> only when two conditions hold: the candidate has no <code>createdBy</code> user (meaning it originated from a trusted background pipeline — ingest, scheduled recompile, source retraction — rather than from a human) and the candidate&#39;s <code>kind</code> is on the trusted list. Everything else flows to a curator.</p>
 <p>This is deletion by provenance. A signal from a known source — the compiler itself, the retraction handler, the scheduled lint — is treated the way a brain treats a signal from one of its own well-calibrated sensory systems. It does not require conscious scrutiny. It passes the gate.</p>
 <p>A signal from an unknown or less reliable source — a chat widget, a user-submitted correction, a reader feedback button — does not pass the gate unattended. It goes to conscious attention, which in Trail&#39;s case is a human curator in the admin UI.</p>
-<p>This is the same policy a child learns to run implicitly. The parent&#39;s voice is trusted by default. The stranger&#39;s voice is not. Trust is not a static property; it is a learned posture toward classes of signal, updated over time by how those classes have behaved in the past. The brain calibrates this continuously. Trail&#39;s policy engine will calibrate it across F19&#39;s iterations as trusted-source lists expand and contract based on observed candidate quality.</p>
+<p>This is the same policy a child learns to run implicitly. The parent&#39;s voice is trusted by default. The stranger&#39;s voice is not. Trust is not a static property; it is a learned posture toward classes of signal, updated over time by how those classes have behaved in the past. The brain calibrates this continuously. Trail&#39;s policy engine will calibrate it over time as trusted-source lists expand and contract based on observed candidate quality.</p>
 <h3>Confidence threshold — attention and arousal</h3>
-<p>The second filter lands in F19 iteration 2. Every candidate will carry a confidence score between 0 and 1. Candidates above threshold pass automatically. Candidates below threshold are raised.</p>
+<p>The second filter lands in a coming iteration. Every candidate will carry a confidence score between 0 and 1. Candidates above threshold pass automatically. Candidates below threshold are raised.</p>
 <p>This is what neuroscientists would recognise as signal-strength gating, and what NLP would recognise as attentional deletion. Weak signals are deleted. Strong signals cross the threshold. The brain runs this computation at the level of individual neurons via membrane potentials: inputs must reach a certain summed strength to trigger firing. Below threshold, nothing happens. Above threshold, the signal propagates.</p>
 <p>The same logic governs memory encoding. Weak, brief, unemotional experiences are rarely consolidated. Strong, repeated, or emotionally salient experiences cross into long-term storage. The amygdala modulates this by stamping experiences that arrived alongside fear, reward, or surprise with extra encoding weight.</p>
 <p>Karl Friston&#39;s free-energy principle, developed over the last two decades, formalises this into a Bayesian framework. A brain, on this account, is continuously running predictions about incoming signals and updating its internal model only when the evidence exceeds a confidence threshold. A signal that confirms what the model already predicts carries low information and can be processed with minimal updating. A signal that disconfirms the model carries high information and demands attention. The threshold is tunable — more attentive states lower it, fatigue raises it.</p>
-<p>Trail&#39;s confidence threshold is the same mechanism made explicit. The compiler emits, alongside each proposed candidate, a scalar representing how strongly the evidence supports the claim. High-confidence claims enter the wiki without ceremony. Low-confidence claims wait for a human to look at them. The threshold is configurable, and it will almost certainly need to be tuned per category of knowledge over time — a medical claim deserves a higher bar than a meeting note.</p>
+<p>Trail&#39;s confidence threshold is the same mechanism made explicit. The compiler emits, alongside each proposed candidate, a scalar representing how strongly the evidence supports the claim. High-confidence claims land as a Neuron without ceremony. Low-confidence claims wait for a human to look at them. The threshold is configurable, and it will almost certainly need to be tuned per category of knowledge over time — a medical claim deserves a higher bar than a meeting note.</p>
 <p><figure class="cms-svg cms-svg--confidence-threshold"><svg viewBox="20 40 780 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Confidence threshold scatter: candidates below threshold raised to curator, above auto-approved">
   <!-- Axes -->
   <!-- horizontal confidence axis -->
@@ -936,7 +936,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 
   <!-- Right zone label (auto) -->
   <text x="685" y="110" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" font-weight="bold" letter-spacing="0.5">AUTO-APPROVED</text>
-  <text x="685" y="124" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">above threshold · passes to wiki</text>
+  <text x="685" y="124" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">above threshold · writes a Neuron</text>
 
   <!-- Candidate dots: below threshold (dimmed, small) -->
   <g fill="currentColor" opacity="0.55">
@@ -979,14 +979,14 @@ body[data-menu-open="true"] { overflow: hidden; }
   <!-- Caption -->
   <text x="420" y="60" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">CONFIDENCE THRESHOLD</text>
 </svg>
-<figcaption>Every candidate carries a scalar. Above the threshold, the wiki updates automatically; below, a human looks at it first.</figcaption></figure></p>
-<p>This filter is the difference between a system that accumulates verified knowledge and a system that accumulates speculation. Brains that skip it become delusional. Wikis that skip it become garbage heaps.</p>
+<figcaption>Every candidate carries a scalar. Above the threshold, a Neuron is written automatically; below, a human looks at it first.</figcaption></figure></p>
+<p>This filter is the difference between a system that accumulates verified knowledge and a system that accumulates speculation. Brains that skip it become delusional. Knowledge stores that skip it become garbage heaps.</p>
 <h3>No contradictions — cognitive dissonance</h3>
-<p>The third filter depends on F32, the background lint pass that cross-references claims across the compiled wiki. Once F32 is running, the policy engine can check any incoming candidate against existing claims. If the candidate contradicts something the wiki already says, the candidate does not auto-approve — regardless of confidence or pipeline. It gets raised to curator review with the conflict explicitly surfaced.</p>
+<p>The third filter depends on the background lint pass that cross-references claims across the Neurons. Once the lint is running, the policy engine can check any incoming candidate against existing claims. If the candidate contradicts something the Neurons already encode, the candidate does not auto-approve — regardless of confidence or pipeline. It gets raised to curator review with the conflict explicitly surfaced.</p>
 <p>This is the hard part. In the brain, it is the part that makes learning difficult. When a new fact contradicts an established belief, the brain does not silently overwrite. Synapses that encode the old belief have been reinforced through repetition and are physically stronger than those carrying a single new input. The anterior cingulate cortex registers the mismatch. The amygdala fires. Dopamine pathways pause. The person experiences something like <em>wait, that does not sound right</em>, and they slow down.</p>
 <p>This pause is what Elizabeth Loftus&#39;s long research programme on false memory has taught us to respect. Memories admitted without this check are memories that can be rewritten by suggestion, repetition, and social pressure. Entire bodies of remembered experience have turned out to be reconstructions built from contradictory inputs that the brain failed to flag at encoding time. The filter matters. Where it weakens, the model of the world loses its grip on the world.</p>
-<p>For a wiki compiled by a language model over thousands of sources, the equivalent failure mode is catastrophic in a slower but equally corrosive way. Source A says one thing. Source B says the opposite. Without a contradiction check, both claims land on the wiki under different phrasings, and subsequent queries retrieve whichever compiled more recently. The wiki becomes internally inconsistent, and every query over the inconsistent region returns noise.</p>
-<p>With F32 in place, the contradiction does not get silently absorbed. It gets surfaced. A curator looks at both sources. A resolution is written — sometimes in favour of A, sometimes in favour of B, sometimes as a new claim that says <em>both are reported; the current evidence is mixed</em>. The wiki encodes not just what is known but what is contested, which is closer to how scientific knowledge actually accumulates than any auto-merging system could produce.</p>
+<p>For a knowledge store compiled by a language model over thousands of sources, the equivalent failure mode is catastrophic in a slower but equally corrosive way. Source A says one thing. Source B says the opposite. Without a contradiction check, both claims land as Neurons under different phrasings, and subsequent queries retrieve whichever compiled more recently. The graph becomes internally inconsistent, and every query over the inconsistent region returns noise.</p>
+<p>With the lint in place, the contradiction does not get silently absorbed. It gets surfaced. A curator looks at both sources. A resolution is written — sometimes in favour of A, sometimes in favour of B, sometimes as a new claim that says <em>both are reported; the current evidence is mixed</em>. The Neurons encode not just what is known but what is contested, which is closer to how scientific knowledge actually accumulates than any auto-merging system could produce.</p>
 <p><figure class="cms-svg cms-svg--contradiction-check"><svg viewBox="20 30 800 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two sources with contradicting claims meet at a contradiction check, routed to curator for resolution">
   <!-- SOURCE A (upper left) -->
   <g fill="none" stroke="currentColor" stroke-width="1.2">
@@ -1029,7 +1029,7 @@ body[data-menu-open="true"] { overflow: hidden; }
   <circle cx="420" cy="215" r="62" fill="none" stroke="#e8a87c" stroke-width="0.3" opacity="0.2"/>
 
   <text x="420" y="265" font-family="monospace" font-size="9" fill="#e8a87c" text-anchor="middle" font-weight="bold" letter-spacing="0.5">CONTRADICTION</text>
-  <text x="420" y="277" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">F32 · background lint</text>
+  <text x="420" y="277" font-family="monospace" font-size="8" fill="currentColor" text-anchor="middle" opacity="0.55">background lint</text>
 
   <!-- Path from contradiction to curator -->
   <line x1="465" y1="215" x2="560" y2="215" stroke="currentColor" stroke-width="0.9" opacity="0.65"/>
@@ -1054,19 +1054,19 @@ body[data-menu-open="true"] { overflow: hidden; }
 
   <!-- Caption -->
   <text x="420" y="65" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">COGNITIVE DISSONANCE, MECHANISED</text>
-  <text x="420" y="80" font-family="monospace" font-size="9"  fill="currentColor" text-anchor="middle" opacity="0.4">the wiki encodes not just what is known, but what is contested</text>
+  <text x="420" y="80" font-family="monospace" font-size="9"  fill="currentColor" text-anchor="middle" opacity="0.4">the Neurons encode not just what is known, but what is contested</text>
 </svg>
 <figcaption>Two sources making opposite claims don't silently overwrite each other. The background lint surfaces the conflict, and a curator resolves — sometimes for A, sometimes for B, sometimes by encoding the disagreement itself.</figcaption></figure></p>
 <h2>Why three and not one</h2>
 <p>None of these filters is sufficient on its own.</p>
-<p>A trusted-pipeline filter alone would admit every signal from trusted sources, including the ones with low confidence and the ones that contradict existing wiki claims. The brain-equivalent failure is a person who believes everything their preferred news source tells them, no matter how poorly supported or internally inconsistent.</p>
+<p>A trusted-pipeline filter alone would admit every signal from trusted sources, including the ones with low confidence and the ones that contradict existing Neurons. The brain-equivalent failure is a person who believes everything their preferred news source tells them, no matter how poorly supported or internally inconsistent.</p>
 <p>A confidence threshold alone would admit high-confidence claims from adversarial sources. The brain-equivalent failure is a person who updates freely on any signal that comes in loud and clear, which is why scams work.</p>
-<p>A contradiction check alone would admit low-confidence novelties as long as they happened to match whatever the wiki already said. The brain-equivalent failure is confirmation bias: a model that grows by accumulating whatever reinforces itself, never correcting.</p>
-<p>The three filters compose. A candidate must come from a trusted pipeline, carry sufficient confidence, and not contradict what the wiki already holds — or else it goes to a human. This is the policy Trail&#39;s queue enforces. It is the same policy, in different vocabularies, that Bandler and Grinder named, that thalamic and prefrontal circuits implement, that Friston&#39;s free-energy principle formalises. Two billion years of evolution converged on this shape because no other shape produces a stable model of a complex world.</p>
+<p>A contradiction check alone would admit low-confidence novelties as long as they happened to match whatever the Neurons already said. The brain-equivalent failure is confirmation bias: a model that grows by accumulating whatever reinforces itself, never correcting.</p>
+<p>The three filters compose. A candidate must come from a trusted pipeline, carry sufficient confidence, and not contradict what the Neurons already hold — or else it goes to a human. This is the policy Trail&#39;s queue enforces. It is the same policy, in different vocabularies, that Bandler and Grinder named, that thalamic and prefrontal circuits implement, that Friston&#39;s free-energy principle formalises. Two billion years of evolution converged on this shape because no other shape produces a stable model of a complex world.</p>
 <h2>The memex, again</h2>
 <p>Vannevar Bush&#39;s 1945 memex essay did not directly address curation. He was writing at a moment when the bottleneck seemed to be retrieval — the explosion of post-war scientific literature outpacing any researcher&#39;s ability to find what they needed. His proposed machine was a tool for building associative trails, not for filtering noise.</p>
 <p>But read carefully, the memex assumed a curator. The person operating it was the one who decided which frames went on which reel, which trails were worth marking, which annotations were worth attaching. The gate was the human.</p>
-<p>Trail inherits that assumption and scales it. The compiler proposes. The policy engine filters. The curator decides. And the wiki — the long-term persistent structure — only admits what passes all three checks, plus any human-reviewed exceptions.</p>
+<p>Trail inherits that assumption and scales it. The compiler proposes. The policy engine filters. The curator decides. And the Neurons — the long-term persistent structure — only admit what passes all three checks, plus any human-reviewed exceptions.</p>
 <p>This is what makes a knowledge system a knowledge system. Not the sophistication of the model attached to it. Not the size of the corpus behind it. The architecture of its gate — and whether the three filters on that gate are doing the work that evolution figured out a long time ago was the only way a model of the world keeps a grip on the world.</p>
 <p>Trail has three filters. The brain has three filters. This is not a coincidence. It is the shape the problem keeps converging on.</p>
 <hr>
