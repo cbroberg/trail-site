@@ -4,7 +4,7 @@
 
 ## Pages
 
-- [Knowledge Infrastructure for the AI Era — trail](https://trail.webhouse.app/): Trail is a knowledge infrastructure engine that turns your sources into a persistent, compounding wiki — maintained by an LLM on your behalf. Realizing Vannevar Bush
+- [Knowledge Infrastructure for the AI Era — trail](https://trail.webhouse.app/): Trail is a knowledge infrastructure engine that turns your sources into a persistent, compounding Neuron-graph — maintained by an LLM on your behalf. Realizing Vannevar Bush
 - [#architecture — trail](https://trail.webhouse.app/tags/architecture/): Content tagged architecture.
 - [#associative-structures — trail](https://trail.webhouse.app/tags/associative-structures/): Content tagged associative-structures.
 - [#comparison — trail](https://trail.webhouse.app/tags/comparison/): Content tagged comparison.
