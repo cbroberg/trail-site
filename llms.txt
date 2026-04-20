@@ -15,6 +15,7 @@
 - [#knowledge-engineering — trail](https://trail.webhouse.app/tags/knowledge-engineering/): Content tagged knowledge-engineering.
 - [#knowledge-infrastructure — trail](https://trail.webhouse.app/tags/knowledge-infrastructure/): Content tagged knowledge-infrastructure.
 - [#lint — trail](https://trail.webhouse.app/tags/lint/): Content tagged lint.
+- [#llm-wiki — trail](https://trail.webhouse.app/tags/llm-wiki/): Content tagged llm-wiki.
 - [#material-elasticity — trail](https://trail.webhouse.app/tags/material-elasticity/): Content tagged material-elasticity.
 - [#memex — trail](https://trail.webhouse.app/tags/memex/): Content tagged memex.
 - [#microfilm — trail](https://trail.webhouse.app/tags/microfilm/): Content tagged microfilm.
