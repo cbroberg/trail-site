@@ -18,5 +18,7 @@
   "artifact-persistence": "NotebookLM sessions are bottles thrown into the sea. Trail writes one Neuron and links the next source to it, then the next.",
   "scan-wall-curve": "A naive sequential scan crosses the 24-hour scheduling window around 8,000 Neurons and the passes start stacking. The sampled pass stays flat — by design.",
   "sampling-split": "Each nightly sample is biased toward recent edits (where contradictions actually live) but reserves room for random long-tail picks so old Neurons never stop being checked.",
-  "dreaming-cycle": "A scheduled pass that sleeps for most of the day and does one bounded hour of integration work. The analogy to slow-wave consolidation is not metaphorical — it is the same pattern."
+  "dreaming-cycle": "A scheduled pass that sleeps for most of the day and does one bounded hour of integration work. The analogy to slow-wave consolidation is not metaphorical — it is the same pattern.",
+  "scale-tiers": "Four representative corpus sizes on a log axis. Each tier stacks its workload state — ingest, lint, queue — above the corpus circle, with amber marks where a workload's behaviour has changed from the previous tier. Infrastructure sits at the top as a growing schematic Machine.",
+  "decision-matrix": "The same tiers as a decision matrix. Amber cells mark the tier where each workload's strategy changes; charcoal cells mean the previous tier's setting still applies. Ingest is the only column that never changes until the very last tier."
 }
