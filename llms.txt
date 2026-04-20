@@ -6,7 +6,6 @@
 
 - [Knowledge Infrastructure for the AI Era — trail](https://trail.webhouse.app/): Trail is a knowledge infrastructure engine that turns your sources into a persistent, compounding Neuron-graph — maintained by an LLM on your behalf. Realizing Vannevar Bush
 - [#architecture — trail](https://trail.webhouse.app/tags/architecture/): Content tagged architecture.
-- [#arkitektur — trail](https://trail.webhouse.app/tags/arkitektur/): Content tagged arkitektur.
 - [#associative-structures — trail](https://trail.webhouse.app/tags/associative-structures/): Content tagged associative-structures.
 - [#comparison — trail](https://trail.webhouse.app/tags/comparison/): Content tagged comparison.
 - [#curation — trail](https://trail.webhouse.app/tags/curation/): Content tagged curation.
@@ -27,14 +26,12 @@
 - [#rag — trail](https://trail.webhouse.app/tags/rag/): Content tagged rag.
 - [#sampling — trail](https://trail.webhouse.app/tags/sampling/): Content tagged sampling.
 - [#scalability — trail](https://trail.webhouse.app/tags/scalability/): Content tagged scalability.
-- [#skalerbarhed — trail](https://trail.webhouse.app/tags/skalerbarhed/): Content tagged skalerbarhed.
 - [#strategy — trail](https://trail.webhouse.app/tags/strategy/): Content tagged strategy.
 - [#systems-design — trail](https://trail.webhouse.app/tags/systems-design/): Content tagged systems-design.
 - [#vannevar-bush — trail](https://trail.webhouse.app/tags/vannevar-bush/): Content tagged vannevar-bush.
 - [As We May Think](https://trail.webhouse.app/the-1945-concept/): In July 1945, an American engineer named Vannevar Bush sketched a machine that would change how humanity thinks about knowledge. He called it the memex. Eighty-one years later, we are finally building it.
 - [Dispatches — trail](https://trail.webhouse.app/trails/dispatches/): Releases, announcements, and observations from the broader knowledge-infrastructure landscape — what's shipping, what's shifting, what's worth watching.
 - [Field Notes — trail](https://trail.webhouse.app/trails/field-notes/): Engineering diaries from inside the Trail build — pipelines, benchmarks, incidents, and the everyday craft of shipping a knowledge engine.
-- [Arbejde der passer i en nat: hvordan Trail holder op med at bekymre sig om korpusstørrelse](https://trail.webhouse.app/trails/how-trail-works/arbejde-der-passer-i-en-nat-da/): Et compile-time vidensystem er nødt til at integrere hver ny kilde mod alt det allerede ved. Integrationsomkostningen vokser med korpus — indtil den en tirsdag aften ikke længere kan nå at blive færdig inden den næste starter. Sådan gør Trail omkostningen begrænset uden at blive blind for den lange hale.
 - [Compile-Time Knowledge: A Technical Argument Against RAG](https://trail.webhouse.app/trails/how-trail-works/compile-time-knowledge-vs-rag/): RAG is a search engine wearing a language model as a hat. Trail compiles knowledge the way a brain consolidates memory — and the architectural difference shows up in latency, accuracy, provenance, and cost.
 - [How a Brain Actually Remembers: Why Trail Compiles Knowledge Instead of Searching For It](https://trail.webhouse.app/trails/how-trail-works/how-a-brain-actually-remembers/): RAG treats knowledge like a filing cabinet. Brains do something fundamentally different — and so does trail. The architecture matters more than the model.
 - [How Trail Works — trail](https://trail.webhouse.app/trails/how-trail-works/): Essays on Trail's architecture — ingest-time compilation, cross-referenced Neurons, and the design choices that make a knowledge graph compound instead of fragment.
