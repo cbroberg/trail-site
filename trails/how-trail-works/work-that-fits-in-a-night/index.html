@@ -818,7 +818,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>Every new source wants to be integrated against everything the system already knows. Every existing page wants to be re-checked against every new claim. Contradictions should not accumulate silently. Stale references should surface. Orphaned Neurons — pages no source supports anymore — should get caught.</p>
 <p>All of this is correct, all of this is necessary, and all of this runs as a nightly background pass. The problem is that the nightly pass is not free, and at a certain corpus size it stops fitting inside the night.</p>
 <p>This is a post about that wall, how we hit it, and how we walked through it without the usual answers — without giving up on full-corpus consistency, without silently skipping old pages, and without turning the whole engine into a distributed computing project.</p>
-<p><figure class="cms-svg cms-svg--scan-wall-curve"><svg viewBox="0 20 855 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Contradiction-scan wall-clock time grows with corpus size, crossing the 24h scheduling window around N=8000 Neurons; sampling holds the line flat.">
+<p><figure class="cms-svg cms-svg--scan-wall-curve"><svg viewBox="0 20 920 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Contradiction-scan wall-clock time grows with corpus size, crossing the 24h scheduling window around N=8000 Neurons; sampling holds the line flat.">
   <text x="460" y="45" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">WHERE THE SCAN HITS THE WALL</text>
 
   <!-- Axes -->
@@ -906,7 +906,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 <h2>The split that works</h2>
 <p>The solution Trail ships is boring in the way good solutions usually are.</p>
 <p>Cap the per-pass budget at 500 Neurons. Spend sixty percent of that budget — three hundred Neurons — on the most-recently-updated pages in the corpus. Spend the remaining forty percent — two hundred Neurons — on a uniform random sample of everything else. Do this every twenty-four hours.</p>
-<p><figure class="cms-svg cms-svg--sampling-split"><svg viewBox="55 20 810 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sampling strategy: 60% of the per-pass budget is drawn from the most-recently-updated Neurons; the remaining 40% is uniformly sampled from the rest of the corpus so long-idle pages still get revisited.">
+<p><figure class="cms-svg cms-svg--sampling-split"><svg viewBox="0 20 920 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sampling strategy: 60% of the per-pass budget is drawn from the most-recently-updated Neurons; the remaining 40% is uniformly sampled from the rest of the corpus so long-idle pages still get revisited.">
   <text x="460" y="45" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">WHAT THE SAMPLE PICKS</text>
 
   <!-- Corpus bar: full population, sorted by updatedAt desc (left=most recent) -->
@@ -1001,7 +1001,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>Five hundred is the number that makes a full pass fit in roughly an hour of wall-clock time on a single Haiku lane, with comfortable headroom for retries and scheduler slack. It is not a constant of the universe. Tune it by environment variable (<code>TRAIL_CONTRADICTION_SAMPLE_SIZE</code>) based on your hardware budget. On a larger deployment with parallel CLI lanes, push it to two thousand. On a Raspberry Pi running a personal knowledge base, drop it to fifty. The sampling strategy does not change — only the cap.</p>
 <p>And cap zero disables the cap entirely. On a corpus of three hundred Neurons, there is nothing to ration; just scan all of them. The code path that handles this is four lines long.</p>
 <h2>What this looks like in a running system</h2>
-<p><figure class="cms-svg cms-svg--dreaming-cycle"><svg viewBox="0 20 725 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The nightly dreaming cycle: sample, scan top-K peers, emit findings, wait — run once every 24 hours like a slow-wave consolidation pass.">
+<p><figure class="cms-svg cms-svg--dreaming-cycle"><svg viewBox="0 20 920 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The nightly dreaming cycle: sample, scan top-K peers, emit findings, wait — run once every 24 hours like a slow-wave consolidation pass.">
   <text x="460" y="45" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">THE NIGHTLY DREAMING PASS</text>
 
   <!-- Clock dial -->

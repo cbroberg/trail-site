@@ -1,4 +1,4 @@
-<svg viewBox="0 0 1165 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four representative corpus sizes — 200, 8k, 25k, 100k Neurons — plotted on a log axis with each tier's ingest, lint, queue, and infrastructure state rendered as a stacked indicator column.">
+<svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four representative corpus sizes — 200, 8k, 25k, 100k Neurons — plotted on a log axis with each tier's ingest, lint, queue, and infrastructure state rendered as a stacked indicator column.">
   <text x="600" y="32" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="2">FOUR TIERS ON A LOG AXIS</text>
 
   <!-- Baseline axis — runs full viewBox width (edge-to-edge) -->
