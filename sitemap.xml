@@ -31,12 +31,27 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/tags/engineering-note/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/tags/history/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://trail.webhouse.app/tags/hypertext/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/infrastructure/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/ingest/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>
@@ -97,6 +112,11 @@
   </url>
   <url>
     <loc>https://trail.webhouse.app/tags/product/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/queue/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>
@@ -182,6 +202,11 @@
   </url>
   <url>
     <loc>https://trail.webhouse.app/trails/research/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/trails/research/scaling-trail-from-200-to-100000-neurons/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>

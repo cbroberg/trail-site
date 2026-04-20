@@ -10,8 +10,11 @@
 - [#comparison — trail](https://trail.webhouse.app/tags/comparison/): Content tagged comparison.
 - [#curation — trail](https://trail.webhouse.app/tags/curation/): Content tagged curation.
 - [#decision-making — trail](https://trail.webhouse.app/tags/decision-making/): Content tagged decision-making.
+- [#engineering-note — trail](https://trail.webhouse.app/tags/engineering-note/): Content tagged engineering-note.
 - [#history — trail](https://trail.webhouse.app/tags/history/): Content tagged history.
 - [#hypertext — trail](https://trail.webhouse.app/tags/hypertext/): Content tagged hypertext.
+- [#infrastructure — trail](https://trail.webhouse.app/tags/infrastructure/): Content tagged infrastructure.
+- [#ingest — trail](https://trail.webhouse.app/tags/ingest/): Content tagged ingest.
 - [#knowledge-engineering — trail](https://trail.webhouse.app/tags/knowledge-engineering/): Content tagged knowledge-engineering.
 - [#knowledge-infrastructure — trail](https://trail.webhouse.app/tags/knowledge-infrastructure/): Content tagged knowledge-infrastructure.
 - [#lint — trail](https://trail.webhouse.app/tags/lint/): Content tagged lint.
@@ -24,6 +27,7 @@
 - [#notebooklm — trail](https://trail.webhouse.app/tags/notebooklm/): Content tagged notebooklm.
 - [#policy — trail](https://trail.webhouse.app/tags/policy/): Content tagged policy.
 - [#product — trail](https://trail.webhouse.app/tags/product/): Content tagged product.
+- [#queue — trail](https://trail.webhouse.app/tags/queue/): Content tagged queue.
 - [#rag — trail](https://trail.webhouse.app/tags/rag/): Content tagged rag.
 - [#sampling — trail](https://trail.webhouse.app/tags/sampling/): Content tagged sampling.
 - [#scalability — trail](https://trail.webhouse.app/tags/scalability/): Content tagged scalability.
@@ -41,6 +45,7 @@
 - [Work That Fits in a Night: How Trail Stops Caring About Corpus Size](https://trail.webhouse.app/trails/how-trail-works/work-that-fits-in-a-night/): A compile-time knowledge system has to integrate new sources against everything it already knows. That integration cost grows with the corpus — until, one Tuesday, it stops finishing before the next night begins. Here is how Trail makes that cost bounded without going blind to the long tail.
 - [Trails — trail](https://trail.webhouse.app/trails/): Essays, field notes, and dispatches from the trail knowledge engine.
 - [Research — trail](https://trail.webhouse.app/trails/research/): Deep dives into adjacent systems, benchmarks, and comparisons — from MemPalace and Mem0 to Karpathy's LLM Wiki and the long tail of RAG variants.
+- [Scaling Trail from 200 to 100,000 Neurons: An Engineering Note](https://trail.webhouse.app/trails/research/scaling-trail-from-200-to-100000-neurons/): A compile-time knowledge engine has three workloads that fight for compute — ingest, lint, and the curation queue. Each one breaks at a different corpus size, for different reasons, and requires a different fix. This is the long-form companion to Work That Fits in a Night: the full accounting of where Trail's bottlenecks are, when they hit, and what a deployment looks like at 200, 8,000, 25,000, and 100,000 Neurons.
 - [Trail and NotebookLM: Same Ethos, Different Artifact](https://trail.webhouse.app/trails/research/trail-and-notebooklm/): NotebookLM proved source-grounded ingest-time tools can ship to millions. Trail shares that ethos and diverges on one question: what the system leaves behind.
 - [As We May Think](https://trail.webhouse.app/trails/the-1945-concept/): In July 1945, an American engineer named Vannevar Bush sketched a machine that would change how humanity thinks about knowledge. He called it the memex. Eighty-one years later, we are finally building it.
 
