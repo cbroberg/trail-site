@@ -1237,7 +1237,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 </ul>
 <p>The compiled Neurons are an order of magnitude denser per token than raw chunks. A Neuron that took 50 source chunks to compile might fit in 1500 tokens because the LLM did the integration work at compile time — removing redundancy, resolving contradictions, structuring the narrative.</p>
 <p>The compile-time cost is paid once per source ingest, not once per query. For a corpus of 1000 sources answering 10K queries per month, the math favors compile-time architecture by a wide margin within weeks.</p>
-<p><figure class="cms-svg cms-svg--cost-over-time"><svg viewBox="0 20 920 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cost per answer over time: RAG stays flat and high because every query repeats the work, Trail front-loads compile cost and reads cheaply thereafter">
+<p><figure class="cms-svg cms-svg--cost-over-time"><svg viewBox="0 20 795 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cost per answer over time: RAG stays flat and high because every query repeats the work, Trail front-loads compile cost and reads cheaply thereafter">
   <!-- Title -->
   <text x="420" y="45" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">WHERE THE COST LIVES</text>
 

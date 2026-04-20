@@ -822,7 +822,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>A compile-time system does the work in advance. Sources are read, integrated, cross-referenced, and compiled into structured knowledge pages as they enter the system. When a user asks a question, the system reads from already-integrated knowledge rather than searching raw fragments. The structure grows and improves with every source added.</p>
 <p>The analogy to human cognition is direct. When you ask a domain expert a question, they do not search their memory for relevant fragments. They draw on knowledge they have already integrated — knowledge that was built up over years of reading, practice, and reflection. The integration happened over time, mostly while they were not actively answering questions. The answer comes quickly and coherently because the work was done in advance.</p>
 <p>A search-time AI system is closer to a research assistant who Googles every question. A compile-time system is closer to the expert.</p>
-<p><figure class="cms-svg cms-svg--knowledge-compounds-curve"><svg viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Knowledge usefulness as a function of sources ingested: RAG stays flat while Trail compounds superlinearly">
+<p><figure class="cms-svg cms-svg--knowledge-compounds-curve"><svg viewBox="0 0 815 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Knowledge usefulness as a function of sources ingested: RAG stays flat while Trail compounds superlinearly">
   <!-- Title -->
   <text x="420" y="45" font-family="monospace" font-size="14" fill="currentColor" text-anchor="middle" opacity="0.6" letter-spacing="1.5">WHAT EACH NEW SOURCE BUYS YOU</text>
 
@@ -903,7 +903,7 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p><strong>What happens when a source is updated?</strong> A compile-time system flags the affected pages for re-review and recompilation. A search-time system silently retains the older chunks and may continue to retrieve them. Ask the vendor to walk through this scenario explicitly.</p>
 <p><strong>Where does the human curator fit?</strong> Compile-time architectures have a first-class role for human review of proposed changes — usually a queue of candidates that the curator approves, edits, or rejects. Search-time systems have no such role because there is nothing to review; the system retrieves and answers in one step. If the vendor&#39;s answer to &quot;how does my expert correct the system?&quot; is &quot;we retrain the embeddings&quot; or &quot;we add to the prompt,&quot; that is search-time architecture.</p>
 <p>These three questions cannot be faked in a sales conversation. Either the architecture supports them or it does not.</p>
-<p><figure class="cms-svg cms-svg--vendor-decision"><svg viewBox="0 0 840 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A 2x2 matrix for choosing between RAG and Trail based on whether the knowledge should accumulate and whether a persistent artifact is wanted">
+<p><figure class="cms-svg cms-svg--vendor-decision"><svg viewBox="35 0 805 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A 2x2 matrix for choosing between RAG and Trail based on whether the knowledge should accumulate and whether a persistent artifact is wanted">
   <!-- Title -->
   <text x="420" y="45" font-family="monospace" font-size="14" fill="currentColor" text-anchor="middle" opacity="0.6" letter-spacing="1.5">WHEN TO PICK WHICH</text>
 
