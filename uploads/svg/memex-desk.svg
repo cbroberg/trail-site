@@ -1,4 +1,4 @@
-<svg viewBox="60 140 720 345" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematic of the Memex desk">
+<svg viewBox="80 140 700 345" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematic of the Memex desk">
   <!-- Base rectangular portion -->
   <path d="M 200 240 L 200 400 L 600 400 L 600 240 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
   <!-- Slanted top -->
