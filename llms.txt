@@ -15,6 +15,7 @@
 - [#hypertext — trail](https://trail.webhouse.app/tags/hypertext/): Content tagged hypertext.
 - [#infrastructure — trail](https://trail.webhouse.app/tags/infrastructure/): Content tagged infrastructure.
 - [#ingest — trail](https://trail.webhouse.app/tags/ingest/): Content tagged ingest.
+- [#karpathy — trail](https://trail.webhouse.app/tags/karpathy/): Content tagged karpathy.
 - [#knowledge-engineering — trail](https://trail.webhouse.app/tags/knowledge-engineering/): Content tagged knowledge-engineering.
 - [#knowledge-infrastructure — trail](https://trail.webhouse.app/tags/knowledge-infrastructure/): Content tagged knowledge-infrastructure.
 - [#lint — trail](https://trail.webhouse.app/tags/lint/): Content tagged lint.
