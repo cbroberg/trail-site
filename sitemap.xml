@@ -11,6 +11,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/tags/arkitektur/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/tags/associative-structures/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
@@ -47,6 +52,11 @@
   </url>
   <url>
     <loc>https://trail.webhouse.app/tags/knowledge-infrastructure/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/lint/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>
@@ -96,6 +106,21 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/tags/sampling/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/scalability/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/tags/skalerbarhed/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/tags/strategy/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
@@ -126,6 +151,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://trail.webhouse.app/trails/how-trail-works/arbejde-der-passer-i-en-nat-da/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://trail.webhouse.app/trails/how-trail-works/compile-time-knowledge-vs-rag/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
@@ -147,6 +177,11 @@
   </url>
   <url>
     <loc>https://trail.webhouse.app/trails/how-trail-works/three-filters-on-the-gate/</loc>
+    <lastmod>2026-04-20</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://trail.webhouse.app/trails/how-trail-works/work-that-fits-in-a-night/</loc>
     <lastmod>2026-04-20</lastmod>
     <priority>0.5</priority>
   </url>
