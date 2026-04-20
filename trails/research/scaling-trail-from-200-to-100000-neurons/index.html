@@ -834,163 +834,165 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>A single human can make roughly fifty to two hundred approve/reject decisions per hour in a focused session. That ceiling does not change when the corpus grows. At 200 Neurons the queue sees a handful of candidates a day and the curator handles them over coffee. At 100,000 Neurons the raw LLM activity would generate thousands per day if it were emitted without triage — which would be useless, because the curator can only process a few hundred.</p>
 <p>The queue&#39;s scaling problem is therefore one of <em>surfacing</em>, not <em>throughput</em>: which candidates are worth the human&#39;s time, and which ones can be auto-merged, auto-deferred, or filtered entirely. The queue has to shrink as the corpus grows, in real terms per-curator-hour, without dropping the material that actually needs a human.</p>
 <p>Each of these three workloads breaks at a different scale. The rest of this note walks through four representative corpus sizes — 200, 8,000, 25,000, and 100,000 Neurons — and describes what each workload looks like at that scale, what infrastructure supports it, and what has to change at the next tier.</p>
-<p><figure class="cms-svg cms-svg--scale-tiers"><svg viewBox="0 0 920 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four representative corpus sizes — 200, 8k, 25k, 100k Neurons — plotted on a log axis with each tier's ingest, lint, queue, and infrastructure state rendered as a stacked indicator column.">
-  <text x="460" y="32" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">FOUR TIERS ON A LOG AXIS</text>
+<p><figure class="cms-svg cms-svg--scale-tiers"><svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four representative corpus sizes — 200, 8k, 25k, 100k Neurons — plotted on a log axis with each tier's ingest, lint, queue, and infrastructure state rendered as a stacked indicator column.">
+  <text x="600" y="32" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="2">FOUR TIERS ON A LOG AXIS</text>
 
-  <!-- Baseline axis -->
-  <line x1="80" y1="360" x2="840" y2="360" stroke="currentColor" stroke-width="1.2"/>
+  <!-- Baseline axis — runs full viewBox width (edge-to-edge) -->
+  <line x1="60" y1="380" x2="1140" y2="380" stroke="currentColor" stroke-width="1.4"/>
 
-  <!-- Log-axis tick marks -->
-  <g stroke="currentColor" stroke-width="0.6" opacity="0.5">
-    <line x1="140" y1="360" x2="140" y2="368"/>
-    <line x1="360" y1="360" x2="360" y2="368"/>
-    <line x1="560" y1="360" x2="560" y2="368"/>
-    <line x1="780" y1="360" x2="780" y2="368"/>
+  <!-- Log-axis tick marks under each tier column -->
+  <g stroke="currentColor" stroke-width="0.7" opacity="0.5">
+    <line x1="200" y1="380" x2="200" y2="390"/>
+    <line x1="520" y1="380" x2="520" y2="390"/>
+    <line x1="810" y1="380" x2="810" y2="390"/>
+    <line x1="1080" y1="380" x2="1080" y2="390"/>
   </g>
 
   <!-- Axis labels -->
-  <g font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="0.5">
-    <text x="140" y="382">200</text>
-    <text x="360" y="382">8,000</text>
-    <text x="560" y="382">25,000</text>
-    <text x="780" y="382">100,000</text>
+  <g font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="0.5">
+    <text x="200" y="410">200</text>
+    <text x="520" y="410">8,000</text>
+    <text x="810" y="410">25,000</text>
+    <text x="1080" y="410">100,000</text>
   </g>
-  <text x="460" y="415" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.7" letter-spacing="0.5">NEURONS IN CORPUS</text>
+  <text x="600" y="448" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.7" letter-spacing="1">NEURONS IN CORPUS</text>
 
   <!-- ═══════════ TIER 1 — 200 ═══════════ -->
-  <!-- Proportional circle: radius by log scale. log(200)≈2.3 -->
-  <g transform="translate(140, 340)">
-    <!-- Corpus circle -->
-    <circle cx="0" cy="0" r="10" fill="none" stroke="currentColor" stroke-width="1.4"/>
-    <circle cx="0" cy="0" r="2" fill="#e8a87c"/>
+  <g transform="translate(200, 360)">
+    <!-- Corpus circle (log-scaled radius) -->
+    <circle cx="0" cy="0" r="12" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="3" fill="#e8a87c"/>
 
     <!-- Workload bars stacked above baseline -->
-    <!-- ingest -->
-    <rect x="-30" y="-32" width="60" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <text x="-36" y="-28" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
-    <!-- lint -->
-    <rect x="-30" y="-44" width="60" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <text x="-36" y="-40" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
-    <!-- queue -->
-    <rect x="-30" y="-56" width="60" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <text x="-36" y="-52" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+    <rect x="-45" y="-40" width="90" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="-52" y="-36" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
+
+    <rect x="-45" y="-56" width="90" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="-52" y="-52" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
+
+    <rect x="-45" y="-72" width="90" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="-52" y="-68" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
 
     <!-- Infra square -->
-    <rect x="-8" y="-88" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <rect x="-10" y="-110" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4"/>
 
-    <!-- Tier label above -->
-    <text x="0" y="-104" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="0.5">BASELINE</text>
+    <!-- Tier label -->
+    <text x="0" y="-132" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">BASELINE</text>
   </g>
 
   <!-- ═══════════ TIER 2 — 8k ═══════════ -->
-  <g transform="translate(360, 340)">
-    <circle cx="0" cy="0" r="16" fill="none" stroke="currentColor" stroke-width="1.4"/>
-    <circle cx="0" cy="0" r="3" fill="#e8a87c"/>
+  <g transform="translate(520, 360)">
+    <circle cx="0" cy="0" r="20" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="4" fill="#e8a87c"/>
 
-    <!-- ingest: still default -->
-    <rect x="-34" y="-38" width="68" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <text x="-40" y="-34" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
+    <rect x="-52" y="-48" width="104" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="-60" y="-44" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
+
     <!-- lint: sampler active (dashed + amber stripe) -->
-    <rect x="-34" y="-50" width="68" height="4" fill="none" stroke="#e8a87c" stroke-width="1.2" stroke-dasharray="3 2"/>
-    <line x1="-34" y1="-48" x2="34" y2="-48" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
-    <text x="-40" y="-46" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
-    <!-- queue: filters matter (single amber tick mark) -->
-    <rect x="-34" y="-62" width="68" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <line x1="8" y1="-62" x2="8" y2="-58" stroke="#e8a87c" stroke-width="1.5"/>
-    <text x="-40" y="-58" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+    <rect x="-52" y="-64" width="104" height="5" fill="none" stroke="#e8a87c" stroke-width="1.4" stroke-dasharray="4 2"/>
+    <line x1="-52" y1="-61" x2="52" y2="-61" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
+    <text x="-60" y="-60" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
 
-    <!-- Infra: perf-2x → slightly larger square with inner dot -->
-    <rect x="-10" y="-96" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.2"/>
-    <circle cx="0" cy="-86" r="1.5" fill="currentColor"/>
+    <!-- queue: filters matter (single amber tick) -->
+    <rect x="-52" y="-80" width="104" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <line x1="12" y1="-80" x2="12" y2="-74" stroke="#e8a87c" stroke-width="1.8"/>
+    <text x="-60" y="-76" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
 
-    <text x="0" y="-112" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="0.5">SAMPLER</text>
+    <!-- Infra: perf-2x -->
+    <rect x="-12" y="-120" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="0" cy="-108" r="2" fill="currentColor"/>
+
+    <text x="0" y="-142" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">SAMPLER</text>
   </g>
 
   <!-- ═══════════ TIER 3 — 25k ═══════════ -->
-  <g transform="translate(560, 340)">
-    <circle cx="0" cy="0" r="22" fill="none" stroke="currentColor" stroke-width="1.4"/>
-    <circle cx="0" cy="0" r="4" fill="#e8a87c"/>
+  <g transform="translate(810, 360)">
+    <circle cx="0" cy="0" r="28" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="5" fill="#e8a87c"/>
 
-    <!-- ingest: default -->
-    <rect x="-38" y="-44" width="76" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <text x="-44" y="-40" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
-    <!-- lint: sampler + parallel haiku (double amber line) -->
-    <rect x="-38" y="-56" width="76" height="4" fill="none" stroke="#e8a87c" stroke-width="1.2" stroke-dasharray="3 2"/>
-    <line x1="-38" y1="-54" x2="38" y2="-54" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
-    <line x1="-38" y1="-52" x2="38" y2="-52" stroke="#e8a87c" stroke-width="1" opacity="0.45"/>
-    <text x="-44" y="-52" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
-    <!-- queue: roles required — three amber seat ticks -->
-    <rect x="-38" y="-68" width="76" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <line x1="-20" y1="-68" x2="-20" y2="-64" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="0" y1="-68" x2="0" y2="-64" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="20" y1="-68" x2="20" y2="-64" stroke="#e8a87c" stroke-width="1.5"/>
-    <text x="-44" y="-64" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+    <rect x="-58" y="-56" width="116" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="-66" y="-52" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
 
-    <!-- Infra: perf-4x → larger square with quadrants -->
-    <rect x="-12" y="-104" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.2"/>
-    <line x1="0" y1="-104" x2="0" y2="-80" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-    <line x1="-12" y1="-92" x2="12" y2="-92" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+    <!-- lint: sampler + parallel (double amber line) -->
+    <rect x="-58" y="-72" width="116" height="5" fill="none" stroke="#e8a87c" stroke-width="1.4" stroke-dasharray="4 2"/>
+    <line x1="-58" y1="-69" x2="58" y2="-69" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
+    <line x1="-58" y1="-67" x2="58" y2="-67" stroke="#e8a87c" stroke-width="1.2" opacity="0.45"/>
+    <text x="-66" y="-68" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
 
-    <text x="0" y="-120" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="0.5">ROLES</text>
+    <!-- queue: roles required (three amber ticks) -->
+    <rect x="-58" y="-88" width="116" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <line x1="-30" y1="-88" x2="-30" y2="-82" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="0" y1="-88" x2="0" y2="-82" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="30" y1="-88" x2="30" y2="-82" stroke="#e8a87c" stroke-width="1.8"/>
+    <text x="-66" y="-84" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+
+    <!-- Infra: perf-4x with quadrants -->
+    <rect x="-15" y="-132" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="0" y1="-132" x2="0" y2="-102" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+    <line x1="-15" y1="-117" x2="15" y2="-117" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+
+    <text x="0" y="-152" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">ROLES</text>
   </g>
 
   <!-- ═══════════ TIER 4 — 100k ═══════════ -->
-  <g transform="translate(780, 340)">
-    <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" stroke-width="1.4"/>
-    <circle cx="0" cy="0" r="6" fill="#e8a87c"/>
+  <g transform="translate(1080, 360)">
+    <circle cx="0" cy="0" r="38" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="7" fill="#e8a87c"/>
     <!-- Inner rings hinting at sub-clusters -->
-    <circle cx="0" cy="0" r="18" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
-    <circle cx="0" cy="0" r="10" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="0" cy="0" r="22" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.3"/>
+    <circle cx="0" cy="0" r="12" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
 
     <!-- ingest: context-select tuned (single amber mark) -->
-    <rect x="-42" y="-52" width="84" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <line x1="0" y1="-52" x2="0" y2="-48" stroke="#e8a87c" stroke-width="1.5"/>
-    <text x="-48" y="-48" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
-    <!-- lint: sampler + multi-lane (3 amber lines) -->
-    <rect x="-42" y="-64" width="84" height="4" fill="none" stroke="#e8a87c" stroke-width="1.2" stroke-dasharray="3 2"/>
-    <line x1="-42" y1="-62" x2="42" y2="-62" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
-    <line x1="-42" y1="-60" x2="42" y2="-60" stroke="#e8a87c" stroke-width="1" opacity="0.45"/>
-    <line x1="-42" y1="-58" x2="42" y2="-58" stroke="#e8a87c" stroke-width="1" opacity="0.3"/>
-    <text x="-48" y="-58" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
-    <!-- queue: auto-routing + grouping (amber arrows fanning out) -->
-    <rect x="-42" y="-76" width="84" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-    <line x1="-28" y1="-76" x2="-28" y2="-72" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="-14" y1="-76" x2="-14" y2="-72" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="0" y1="-76" x2="0" y2="-72" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="14" y1="-76" x2="14" y2="-72" stroke="#e8a87c" stroke-width="1.5"/>
-    <line x1="28" y1="-76" x2="28" y2="-72" stroke="#e8a87c" stroke-width="1.5"/>
-    <text x="-48" y="-72" font-family="monospace" font-size="8" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+    <rect x="-64" y="-64" width="128" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <line x1="0" y1="-64" x2="0" y2="-58" stroke="#e8a87c" stroke-width="1.8"/>
+    <text x="-72" y="-60" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">i</text>
 
-    <!-- Infra: perf-8x with read-replica (primary + satellite) -->
-    <rect x="-14" y="-112" width="28" height="22" fill="none" stroke="currentColor" stroke-width="1.2"/>
-    <line x1="-4" y1="-112" x2="-4" y2="-90" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-    <line x1="6" y1="-112" x2="6" y2="-90" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-    <rect x="20" y="-104" width="12" height="10" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.7"/>
-    <line x1="14" y1="-99" x2="20" y2="-99" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.6"/>
+    <!-- lint: sampler + multi-lane (three amber lines) -->
+    <rect x="-64" y="-80" width="128" height="5" fill="none" stroke="#e8a87c" stroke-width="1.4" stroke-dasharray="4 2"/>
+    <line x1="-64" y1="-77" x2="64" y2="-77" stroke="#e8a87c" stroke-width="2" opacity="0.6"/>
+    <line x1="-64" y1="-75" x2="64" y2="-75" stroke="#e8a87c" stroke-width="1.2" opacity="0.45"/>
+    <line x1="-64" y1="-73" x2="64" y2="-73" stroke="#e8a87c" stroke-width="1.2" opacity="0.3"/>
+    <text x="-72" y="-76" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">l</text>
 
-    <text x="0" y="-128" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="0.5">FEDERATED</text>
+    <!-- queue: auto-routing + grouping (five amber ticks) -->
+    <rect x="-64" y="-96" width="128" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+    <line x1="-44" y1="-96" x2="-44" y2="-90" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="-22" y1="-96" x2="-22" y2="-90" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="0" y1="-96" x2="0" y2="-90" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="22" y1="-96" x2="22" y2="-90" stroke="#e8a87c" stroke-width="1.8"/>
+    <line x1="44" y1="-96" x2="44" y2="-90" stroke="#e8a87c" stroke-width="1.8"/>
+    <text x="-72" y="-92" font-family="monospace" font-size="10" fill="currentColor" text-anchor="end" opacity="0.7">q</text>
+
+    <!-- Infra: perf-8x + read-replica (primary + satellite) -->
+    <rect x="-18" y="-140" width="36" height="28" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="-6" y1="-140" x2="-6" y2="-112" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+    <line x1="6" y1="-140" x2="6" y2="-112" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+    <rect x="24" y="-130" width="14" height="12" fill="none" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+    <line x1="18" y1="-124" x2="24" y2="-124" stroke="currentColor" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.6"/>
+
+    <text x="10" y="-160" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="1">FEDERATED</text>
   </g>
 
-  <!-- ═══════════ LEGEND ═══════════ -->
-  <g transform="translate(80, 74)" font-family="monospace" font-size="9" fill="currentColor" opacity="0.72">
-    <text x="0" y="0" letter-spacing="1" opacity="0.55">LEGEND</text>
-    <g transform="translate(0, 14)">
-      <text x="18" y="4">i — ingest · l — lint · q — queue</text>
+  <!-- ═══════════ LEGEND — top-left, sits above the tier columns ═══════════ -->
+  <g transform="translate(60, 80)" font-family="monospace" font-size="11" fill="currentColor" opacity="0.75">
+    <text x="0" y="0" letter-spacing="1.5" opacity="0.55">LEGEND</text>
+    <g transform="translate(0, 20)">
+      <text x="0" y="4">i — ingest · l — lint · q — queue</text>
     </g>
-    <g transform="translate(0, 28)">
-      <rect x="0" y="-3" width="14" height="4" fill="none" stroke="currentColor" stroke-width="1"/>
-      <text x="18" y="4">default path</text>
-    </g>
-    <g transform="translate(0, 42)">
-      <rect x="0" y="-3" width="14" height="4" fill="none" stroke="#e8a87c" stroke-width="1.2" stroke-dasharray="3 2"/>
-      <line x1="0" y1="-1" x2="14" y2="-1" stroke="#e8a87c" stroke-width="1.2" opacity="0.6"/>
-      <text x="18" y="4">sampler / bounded pass</text>
+    <g transform="translate(0, 38)">
+      <rect x="0" y="-4" width="18" height="5" fill="none" stroke="currentColor" stroke-width="1"/>
+      <text x="26" y="4">default path</text>
     </g>
     <g transform="translate(0, 56)">
-      <line x1="0" y1="-1" x2="4" y2="3" stroke="#e8a87c" stroke-width="1.5"/>
-      <line x1="7" y1="-1" x2="7" y2="3" stroke="#e8a87c" stroke-width="1.5"/>
-      <line x1="11" y1="-1" x2="11" y2="3" stroke="#e8a87c" stroke-width="1.5"/>
-      <text x="18" y="4">amber ticks — new behaviour added at this tier</text>
+      <rect x="0" y="-4" width="18" height="5" fill="none" stroke="#e8a87c" stroke-width="1.4" stroke-dasharray="4 2"/>
+      <line x1="0" y1="-1" x2="18" y2="-1" stroke="#e8a87c" stroke-width="1.4" opacity="0.6"/>
+      <text x="26" y="4">sampler / bounded pass</text>
+    </g>
+    <g transform="translate(0, 74)">
+      <line x1="4" y1="-2" x2="4" y2="4" stroke="#e8a87c" stroke-width="1.8"/>
+      <line x1="10" y1="-2" x2="10" y2="4" stroke="#e8a87c" stroke-width="1.8"/>
+      <line x1="16" y1="-2" x2="16" y2="4" stroke="#e8a87c" stroke-width="1.8"/>
+      <text x="26" y="4">amber ticks — new behaviour added at this tier</text>
     </g>
   </g>
 </svg>
@@ -1033,175 +1035,168 @@ body[data-menu-open="true"] { overflow: hidden; }
 <p>At this scale, the argument for migrating to a split-compute architecture (separate ingest workers, separate lint workers, a shared database) is tempting but probably wrong. The ingest pipeline is embarrassingly parallel already — Fly.io&#39;s per-region auto-scaling can spin up additional ingest workers on demand, and they can write to the shared libSQL over the Turso-compatible network protocol without a full application rewrite. The lint pass is already bounded by the sampler cap, so throwing workers at it doesn&#39;t help. The database is the only truly stateful component, and at 8 GB it&#39;s still inside the comfort zone of a single embedded node.</p>
 <p>The architecture that shows up around 100k is therefore: one primary Fly.io Machine running the server and the embedded libSQL, one read-replica in a different region for failover, a pool of ingest workers in the primary region that compile sources into the primary DB, and the usual Trail scheduler (unchanged from 8k) running the sampler on the primary.</p>
 <h2>Decision matrix — what to worry about, when</h2>
-<p><figure class="cms-svg cms-svg--decision-matrix"><svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decision matrix: four corpus-size tiers (200, 8k, 25k, 100k Neurons) across four workload columns (ingest, lint, queue, infra). Amber cells mark the tier where each workload's behaviour changes; charcoal cells mean the previous tier's settings still apply.">
-  <text x="460" y="32" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="1.5">WHAT TO WORRY ABOUT, WHEN</text>
+<p><figure class="cms-svg cms-svg--decision-matrix"><svg viewBox="0 0 1200 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decision matrix: four corpus-size tiers (200, 8k, 25k, 100k Neurons) across four workload columns (ingest, lint, queue, infra). Amber cells mark the tier where each workload's behaviour changes; charcoal cells mean the previous tier's settings still apply.">
+  <text x="600" y="32" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle" opacity="0.55" letter-spacing="2">WHAT TO WORRY ABOUT, WHEN</text>
 
-  <!-- ═══════════ GRID ═══════════ -->
-  <!-- Column positions: row label col (110 wide), then 4 data cols (180 wide) -->
-  <!-- Row positions: header row (40 tall), then 4 tier rows (80 tall) -->
+  <!-- ═══════════ GRID — edge-to-edge, no internal padding ═══════════ -->
+  <!-- Cols: TIER 140 | INGEST 230 | LINT 280 | QUEUE 270 | INFRA 280 = 1200 -->
+  <!-- Row heights: header 50 (y=70→120), then 4 tier rows 100 tall each
+       (centres at y=170, 270, 370, 470). Outer frame ends at y=520. -->
 
   <!-- Outer frame -->
-  <rect x="60" y="70" width="820" height="360" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <rect x="0" y="70" width="1200" height="450" fill="none" stroke="currentColor" stroke-width="1.4"/>
 
   <!-- Vertical column separators -->
-  <line x1="170" y1="70" x2="170" y2="430" stroke="currentColor" stroke-width="1.2"/>
-  <line x1="350" y1="70" x2="350" y2="430" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-  <line x1="530" y1="70" x2="530" y2="430" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-  <line x1="710" y1="70" x2="710" y2="430" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="140" y1="70" x2="140" y2="520" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="370" y1="70" x2="370" y2="520" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+  <line x1="650" y1="70" x2="650" y2="520" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+  <line x1="920" y1="70" x2="920" y2="520" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
 
   <!-- Horizontal row separators -->
-  <line x1="60" y1="110" x2="880" y2="110" stroke="currentColor" stroke-width="1.2"/>
-  <line x1="60" y1="190" x2="880" y2="190" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-  <line x1="60" y1="270" x2="880" y2="270" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
-  <line x1="60" y1="350" x2="880" y2="350" stroke="currentColor" stroke-width="0.6" opacity="0.5"/>
+  <line x1="0" y1="120" x2="1200" y2="120" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="0" y1="220" x2="1200" y2="220" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+  <line x1="0" y1="320" x2="1200" y2="320" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="currentColor" stroke-width="0.7" opacity="0.5"/>
+  <line x1="0" y1="520" x2="1200" y2="520" stroke="currentColor" stroke-width="1.4"/>
 
   <!-- ═══════════ COLUMN HEADERS ═══════════ -->
-  <g font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" letter-spacing="1.5" opacity="0.8">
-    <text x="115" y="95">TIER</text>
-    <text x="260" y="95">INGEST</text>
-    <text x="440" y="95">LINT</text>
-    <text x="620" y="95">QUEUE</text>
-    <text x="800" y="95">INFRA</text>
+  <g font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" letter-spacing="2" opacity="0.85">
+    <text x="70" y="101">TIER</text>
+    <text x="255" y="101">INGEST</text>
+    <text x="510" y="101">LINT</text>
+    <text x="785" y="101">QUEUE</text>
+    <text x="1060" y="101">INFRA</text>
   </g>
 
   <!-- ═══════════ ROW: 200 Neurons ═══════════ -->
-  <g transform="translate(0, 150)">
+  <g transform="translate(0, 170)">
     <!-- Tier cell -->
-    <text x="115" y="-6" font-family="monospace" font-size="16" fill="currentColor" text-anchor="middle">200</text>
-    <text x="115" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
+    <text x="70" y="-4" font-family="monospace" font-size="20" fill="currentColor" text-anchor="middle">200</text>
+    <text x="70" y="18" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
 
-    <!-- Ingest: default -->
-    <g transform="translate(260, 0)">
-      <rect x="-32" y="-16" width="64" height="28" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
-      <text x="0" y="4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
+    <!-- INGEST: default -->
+    <g transform="translate(255, 0)">
+      <rect x="-50" y="-22" width="100" height="40" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+      <text x="0" y="6" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
     </g>
-    <!-- Lint: default -->
-    <g transform="translate(440, 0)">
-      <rect x="-32" y="-16" width="64" height="28" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
-      <text x="0" y="4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
+    <!-- LINT: default -->
+    <g transform="translate(510, 0)">
+      <rect x="-50" y="-22" width="100" height="40" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+      <text x="0" y="6" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
     </g>
-    <!-- Queue: default -->
-    <g transform="translate(620, 0)">
-      <rect x="-32" y="-16" width="64" height="28" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
-      <text x="0" y="4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
+    <!-- QUEUE: default -->
+    <g transform="translate(785, 0)">
+      <rect x="-50" y="-22" width="100" height="40" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+      <text x="0" y="6" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
     </g>
-    <!-- Infra: shared-cpu — AMBER (first entry in column) -->
-    <g transform="translate(800, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">shared-cpu</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">single Machine</text>
+    <!-- INFRA: shared-cpu — AMBER (first entry in column) -->
+    <g transform="translate(1060, 0)">
+      <rect x="-100" y="-30" width="200" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-100" y1="-30" x2="-100" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">shared-cpu</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">single Machine</text>
     </g>
   </g>
 
   <!-- ═══════════ ROW: 8,000 Neurons ═══════════ -->
-  <g transform="translate(0, 230)">
-    <text x="115" y="-6" font-family="monospace" font-size="16" fill="currentColor" text-anchor="middle">8,000</text>
-    <text x="115" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
+  <g transform="translate(0, 270)">
+    <text x="70" y="-4" font-family="monospace" font-size="20" fill="currentColor" text-anchor="middle">8,000</text>
+    <text x="70" y="18" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
 
-    <!-- Ingest: default -->
-    <g transform="translate(260, 0)">
-      <rect x="-32" y="-16" width="64" height="28" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
-      <text x="0" y="4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
+    <!-- INGEST: default -->
+    <g transform="translate(255, 0)">
+      <rect x="-50" y="-22" width="100" height="40" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+      <text x="0" y="6" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
     </g>
-    <!-- Lint: sampler on — AMBER -->
-    <g transform="translate(440, 0)">
-      <rect x="-70" y="-22" width="140" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-70" y1="-22" x2="-70" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">sampler enabled</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">cap = 500 / night</text>
+    <!-- LINT: sampler enabled — AMBER -->
+    <g transform="translate(510, 0)">
+      <rect x="-120" y="-30" width="240" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-120" y1="-30" x2="-120" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">sampler enabled</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">cap = 500 / night</text>
     </g>
-    <!-- Queue: filters matter — AMBER -->
-    <g transform="translate(620, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">filters matter</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">+ auto-approval</text>
+    <!-- QUEUE: filters matter — AMBER -->
+    <g transform="translate(785, 0)">
+      <rect x="-115" y="-30" width="230" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-115" y1="-30" x2="-115" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">filters matter</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">+ auto-approval</text>
     </g>
-    <!-- Infra: perf-2x — AMBER -->
-    <g transform="translate(800, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">perf-2x</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">+ backups</text>
+    <!-- INFRA: perf-2x — AMBER -->
+    <g transform="translate(1060, 0)">
+      <rect x="-100" y="-30" width="200" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-100" y1="-30" x2="-100" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">perf-2x</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">+ backups</text>
     </g>
   </g>
 
   <!-- ═══════════ ROW: 25,000 Neurons ═══════════ -->
-  <g transform="translate(0, 310)">
-    <text x="115" y="-6" font-family="monospace" font-size="16" fill="currentColor" text-anchor="middle">25,000</text>
-    <text x="115" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
+  <g transform="translate(0, 370)">
+    <text x="70" y="-4" font-family="monospace" font-size="20" fill="currentColor" text-anchor="middle">25,000</text>
+    <text x="70" y="18" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
 
-    <!-- Ingest: default -->
-    <g transform="translate(260, 0)">
-      <rect x="-32" y="-16" width="64" height="28" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
-      <text x="0" y="4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
+    <!-- INGEST: default -->
+    <g transform="translate(255, 0)">
+      <rect x="-50" y="-22" width="100" height="40" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.4"/>
+      <text x="0" y="6" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.72">default</text>
     </g>
-    <!-- Lint: sampler + parallel — AMBER -->
-    <g transform="translate(440, 0)">
-      <rect x="-70" y="-22" width="140" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-70" y1="-22" x2="-70" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">+ parallel Haiku</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">cap = 1,200</text>
+    <!-- LINT: + parallel Haiku — AMBER -->
+    <g transform="translate(510, 0)">
+      <rect x="-120" y="-30" width="240" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-120" y1="-30" x2="-120" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">+ parallel Haiku</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">cap = 1,200</text>
     </g>
-    <!-- Queue: roles required — AMBER -->
-    <g transform="translate(620, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">roles required</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">RBAC · per topic</text>
+    <!-- QUEUE: roles required — AMBER -->
+    <g transform="translate(785, 0)">
+      <rect x="-115" y="-30" width="230" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-115" y1="-30" x2="-115" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">roles required</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">RBAC · per topic</text>
     </g>
-    <!-- Infra: perf-4x — AMBER -->
-    <g transform="translate(800, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">perf-4x</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">+ monitoring</text>
+    <!-- INFRA: perf-4x — AMBER -->
+    <g transform="translate(1060, 0)">
+      <rect x="-100" y="-30" width="200" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-100" y1="-30" x2="-100" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">perf-4x</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">+ monitoring</text>
     </g>
   </g>
 
   <!-- ═══════════ ROW: 100,000 Neurons ═══════════ -->
-  <g transform="translate(0, 390)">
-    <text x="115" y="-6" font-family="monospace" font-size="16" fill="currentColor" text-anchor="middle">100,000</text>
-    <text x="115" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
+  <g transform="translate(0, 470)">
+    <text x="70" y="-4" font-family="monospace" font-size="20" fill="currentColor" text-anchor="middle">100,000</text>
+    <text x="70" y="18" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.55">Neurons</text>
 
-    <!-- Ingest: context-select tuned — AMBER (first amber in ingest col) -->
-    <g transform="translate(260, 0)">
-      <rect x="-60" y="-22" width="120" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-60" y1="-22" x2="-60" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">context-select</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">tuned</text>
+    <!-- INGEST: context-select tuned — AMBER (first amber in ingest col) -->
+    <g transform="translate(255, 0)">
+      <rect x="-100" y="-30" width="200" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-100" y1="-30" x2="-100" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">context-select</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">tuned</text>
     </g>
-    <!-- Lint: sampler at 3k, multi-lane — AMBER -->
-    <g transform="translate(440, 0)">
-      <rect x="-70" y="-22" width="140" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-70" y1="-22" x2="-70" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">cap = 3k · multi-lane</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">~3-week tail coverage</text>
+    <!-- LINT: cap = 3k · multi-lane — AMBER -->
+    <g transform="translate(510, 0)">
+      <rect x="-125" y="-30" width="250" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-125" y1="-30" x2="-125" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">cap = 3k · multi-lane</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">~3-week tail coverage</text>
     </g>
-    <!-- Queue: auto-routing + grouping — AMBER -->
-    <g transform="translate(620, 0)">
-      <rect x="-70" y="-22" width="140" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-70" y1="-22" x2="-70" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">auto-routing</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">+ grouping</text>
+    <!-- QUEUE: auto-routing — AMBER -->
+    <g transform="translate(785, 0)">
+      <rect x="-115" y="-30" width="230" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-115" y1="-30" x2="-115" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">auto-routing</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">+ grouping</text>
     </g>
-    <!-- Infra: perf-8x + read-replica — AMBER -->
-    <g transform="translate(800, 0)">
-      <rect x="-70" y="-22" width="140" height="40" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-      <line x1="-70" y1="-22" x2="-70" y2="18" stroke="#e8a87c" stroke-width="3"/>
-      <text x="0" y="-4" font-family="monospace" font-size="10" fill="currentColor" text-anchor="middle">perf-8x</text>
-      <text x="0" y="10" font-family="monospace" font-size="9" fill="currentColor" text-anchor="middle" opacity="0.6">+ read-replica</text>
+    <!-- INFRA: perf-8x + read-replica — AMBER -->
+    <g transform="translate(1060, 0)">
+      <rect x="-115" y="-30" width="230" height="56" fill="none" stroke="#e8a87c" stroke-width="1.6"/>
+      <line x1="-115" y1="-30" x2="-115" y2="26" stroke="#e8a87c" stroke-width="4"/>
+      <text x="0" y="-4" font-family="monospace" font-size="13" fill="currentColor" text-anchor="middle">perf-8x</text>
+      <text x="0" y="14" font-family="monospace" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">+ read-replica</text>
     </g>
-  </g>
-
-  <!-- ═══════════ FOOTER LEGEND ═══════════ -->
-  <g transform="translate(60, 450)" font-family="monospace" font-size="9" fill="currentColor" opacity="0.6" letter-spacing="0.5">
-    <rect x="0" y="-8" width="14" height="10" fill="none" stroke="#e8a87c" stroke-width="1.4"/>
-    <text x="22" y="0">amber = new behaviour kicks in at this tier</text>
-
-    <rect x="320" y="-8" width="14" height="10" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.7"/>
-    <text x="342" y="0">charcoal = previous tier's setting still applies</text>
   </g>
 </svg>
 <figcaption>The same tiers as a decision matrix. Amber cells mark the tier where each workload's strategy changes; charcoal cells mean the previous tier's setting still applies. Ingest is the only column that never changes until the very last tier.</figcaption></figure></p>
