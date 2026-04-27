@@ -17,7 +17,7 @@ const COOKIE = `cms-session=${JWT}; cms-active-org=${ORG}; cms-active-site=${SIT
 
 async function fetchJson(path) {
   const res = await fetch(`${BASE}${path}`, { headers: { Cookie: COOKIE } });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText} → ${path}`);
   return res.json();
 }
 
@@ -25,8 +25,7 @@ const COLLECTIONS = ["posts", "pages", "categories", "global"];
 console.log(`Fetching from ${BASE} (org:${ORG} site:${SITE})`);
 
 for (const col of COLLECTIONS) {
-  const dir = join(CONTENT_DIR, col);
-  mkdirSync(dir, { recursive: true });
+  mkdirSync(join(CONTENT_DIR, col), { recursive: true });
   try {
     const data = await fetchJson(`/api/cms/${col}?limit=500`);
     const docs = Array.isArray(data) ? data : (data.documents ?? data.docs ?? []);
@@ -34,7 +33,12 @@ for (const col of COLLECTIONS) {
     for (const doc of docs) {
       const slug = doc.slug ?? doc.id;
       if (!slug) continue;
-      writeFileSync(join(dir, `${slug}.json`), JSON.stringify(doc, null, 2));
+      // Sanitize slug: replace any '/' so we never create unintended subdirs
+      const safeSlug = String(slug).replace(/\//g, "-");
+      const outPath = join(CONTENT_DIR, col, `${safeSlug}.json`);
+      // Guard against nested paths even after sanitization
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, JSON.stringify(doc, null, 2));
       n++;
     }
     console.log(`  ${col}: ${n} docs`);
@@ -42,4 +46,4 @@ for (const col of COLLECTIONS) {
     console.warn(`  ${col}: SKIP (${err.message})`);
   }
 }
-console.log("Content fetched →", CONTENT_DIR);
+console.log("Content fetched ->", CONTENT_DIR);
