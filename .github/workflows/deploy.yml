@@ -38,7 +38,20 @@ jobs:
           curl -L https://fly.io/install.sh | FLYCTL_INSTALL=$HOME/.fly sh
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
-      - name: Deploy to trail-landing (trailmem.com)
+      - name: Deploy to Fly.io
         run: flyctl deploy -a trail-landing --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Notify CMS (deploy complete)
+        if: always()
+        run: |
+          STATUS="success"
+          if [ "${{ job.status }}" != "success" ]; then STATUS="failure"; fi
+          START_TIME="${{ steps.build-and-deploy.startedAt }}"
+          ELAPSED=$(( ($(date +%s) - $(date -d "$START_TIME" +%s 2>/dev/null || echo $(date +%s))) ))
+          curl -s -X POST "${{ vars.CMS_BASE_URL }}/api/admin/deploy/notify" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DEPLOY_NOTIFY_SECRET }}" \
+            -d "{\"status\":\"$STATUS\",\"url\":\"https://trailmem.com\",\"app\":\"trail-landing\",\"duration\":$ELAPSED}" \
+            || true
