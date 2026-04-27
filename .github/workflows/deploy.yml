@@ -1,0 +1,54 @@
+name: Deploy Trail Landing to trailmem.com
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Deploy reason'
+        default: 'Content update from webhouse.app'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout trail repo (build tools + assets)
+        uses: actions/checkout@v4
+        with:
+          repository: cbroberg/trail
+          path: trail
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: trail/apps/landing/package.json
+
+      - name: Install landing deps
+        working-directory: trail/apps/landing
+        run: npm install
+
+      - name: Fetch published content from webhouse.app
+        working-directory: trail/apps/landing
+        run: node scripts/fetch-webhouse-content.mjs
+        env:
+          WEBHOUSE_JWT: ${{ secrets.WEBHOUSE_CMS_JWT }}
+          WEBHOUSE_URL: https://webhouse.app
+          WEBHOUSE_ORG: broberg-ai
+          WEBHOUSE_SITE: trail
+
+      - name: Build static site
+        working-directory: trail/apps/landing
+        run: npx tsx build.ts
+        env:
+          BUILD_OUT_DIR: deploy
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io (trail-landing → trailmem.com)
+        working-directory: trail/apps/landing
+        run: fly deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
