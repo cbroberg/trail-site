@@ -11,7 +11,7 @@
 import { readdirSync, readFileSync, mkdirSync, writeFileSync, existsSync, cpSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { marked } from "marked";
-import { expandShortcodes } from "@webhouse/cms";
+import { expandShortcodes } from "./shortcodes.ts";
 
 const BASE_PATH = process.env.BASE_PATH ?? "";
 const OUT_DIR = process.env.BUILD_OUT_DIR ?? "dist";
