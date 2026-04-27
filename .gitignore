@@ -1,0 +1,6 @@
+node_modules/
+dist/
+content/
+_data/
+_revisions/
+*.log
