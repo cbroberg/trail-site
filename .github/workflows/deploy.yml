@@ -16,14 +16,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cbroberg/trail
+          token: ${{ secrets.TRAIL_GITHUB_TOKEN }}
           path: trail
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: trail/apps/landing/package.json
 
       - name: Install landing deps
         working-directory: trail/apps/landing
@@ -47,7 +46,7 @@ jobs:
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Deploy to Fly.io (trail-landing → trailmem.com)
+      - name: Deploy to Fly.io
         working-directory: trail/apps/landing
         run: fly deploy --remote-only
         env:
