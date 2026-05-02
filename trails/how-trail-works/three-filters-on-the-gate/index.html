@@ -1016,7 +1016,7 @@ body[data-menu-open="true"] { overflow: hidden; }
   <!-- Sub-caption -->
   <text x="420" y="450" font-family="monospace" font-size="12" fill="currentColor" text-anchor="middle" opacity="0.5" letter-spacing="0.5">two billion years of evolution converged on this pattern</text>
 </svg>
-<figcaption>The same three filters under three different vocabularies: what Bandler &amp; Grinder named in 1975, what thalamic and prefrontal circuits implement biologically, and what Trail's policy engine enforces.</figcaption></figure></p>
+<figcaption>The same three filters under three different vocabularies: what Bandler & Grinder named in 1975, what thalamic and prefrontal circuits implement biologically, and what Trail's policy engine enforces.</figcaption></figure></p>
 <h2>Trail&#39;s three filters, one by one</h2>
 <h3>Trusted pipeline — deletion by provenance</h3>
 <p>The first filter is already in production. <code>shouldAutoApprove(candidate)</code> in <code>packages/core/src/queue/policy.ts</code> returns <code>true</code> only when two conditions hold: the candidate has no <code>createdBy</code> user (meaning it originated from a trusted background pipeline — ingest, scheduled recompile, source retraction — rather than from a human) and the candidate&#39;s <code>kind</code> is on the trusted list. Everything else flows to a curator.</p>
